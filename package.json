@@ -1,0 +1,32 @@
+{
+  "name": "axobot-api",
+  "version": "0.1.0",
+  "description": "A TypeScript API for the Axobot Discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "dev": "npx nodemon",
+    "build": "tsc",
+    "start": "npm run build && node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZRunner/Axobot-API-V2.git"
+  },
+  "author": "ZRunner",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ZRunner/Axobot-API-V2/issues"
+  },
+  "homepage": "https://github.com/ZRunner/Axobot-API-V2#readme",
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.60.0",
+    "@typescript-eslint/parser": "^5.60.0",
+    "eslint": "^8.43.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}
