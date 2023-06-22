@@ -32,6 +32,9 @@ export function authorFromProject(project: CrowdinProject) {
  * @returns The webhook response
  */
 export function sendToDiscord(webhookPath: string, data: {content?: string, embeds?: unknown[]}) {
+    if (!/^\d+\/\w+$/.test(webhookPath)) {
+        return Promise.reject(new Error("Invalid webhook path"));
+    }
     return fetch(`https://discord.com/api/webhooks/${webhookPath}`, {
         method: "POST",
         headers: {

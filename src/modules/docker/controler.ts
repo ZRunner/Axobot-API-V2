@@ -15,6 +15,9 @@ function sendToDiscord(webhookPath: string, data: {content?: string, embeds?: un
 }
 
 function callbackDockerhub(callbackUrl: string) {
+    if (!callbackUrl.startsWith("https://registry.hub.docker.com/")) {
+        return Promise.reject(new Error("Invalid callback domain"));
+    }
     return fetch(callbackUrl, {
         method: "POST",
         headers: {
@@ -30,6 +33,10 @@ function callbackDockerhub(callbackUrl: string) {
 
 export async function postWebhookNotification(req: Request<{webhook_id: string, webhook_token: string}, unknown, DockerPushEvent>, res: Response) {
     const webhookPath = req.params.webhook_id + "/" + req.params.webhook_token;
+    if (!/^\d+\/\w+$/.test(webhookPath)) {
+        res.status(400).send("Invalid webhook path");
+        return;
+    }
     const repo = req.body.repository;
     const pushData = req.body.push_data;
     const embed = {
