@@ -1,11 +1,11 @@
 export interface CrowdinFileAddedEvent {
-    event: 'file.added';
+    event: "file.added";
     file: CrowdinFile;
     user: CrowdinUser;
 }
 
 export interface CrowdinFileFullyTranslatedEvent {
-    event: 'file.translated';
+    event: "file.translated";
     file: CrowdinFile;
     targetLanguage: {
         id: string;
@@ -23,25 +23,25 @@ export interface CrowdinFileFullyTranslatedEvent {
 }
 
 export interface CrowdinFileUpdatedEvent {
-    event: 'file.updated';
+    event: "file.updated";
     file: CrowdinFile;
     user: CrowdinUser;
 }
 
 export interface CrowdinSourceStringAddedEvent {
-    event: 'string.added';
+    event: "string.added";
     string: CrowdinString;
     user: CrowdinUser;
 }
 
 export interface CrowdinSourceStringUpdatedEvent {
-    event: 'string.updated';
+    event: "string.updated";
     string: CrowdinString;
     user: CrowdinUser;
 }
 
 export interface CrowdinSourceStringDeletedEvent {
-    event: 'string.deleted';
+    event: "string.deleted";
     string: CrowdinString;
     user: CrowdinUser;
 }

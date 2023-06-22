@@ -1,4 +1,4 @@
-import { CrowdinUser, CrowdinProject } from "./types/commons"
+import { CrowdinUser, CrowdinProject } from "./types/commons";
 
 /**
  * Generate an embed footer from a Crowdin user
@@ -8,8 +8,8 @@ import { CrowdinUser, CrowdinProject } from "./types/commons"
 export function footerFromUser(user: CrowdinUser) {
     return {
         name: `Translated by ${user.username}`,
-        icon_url: user.avatarUrl
-    }
+        icon_url: user.avatarUrl,
+    };
 }
 
 /**
@@ -21,7 +21,7 @@ export function authorFromProject(project: CrowdinProject) {
     return {
         name: project.name,
         url: project.url,
-    }
+    };
 }
 
 /**
@@ -32,10 +32,10 @@ export function authorFromProject(project: CrowdinProject) {
  */
 export function sendToDiscord(webhook_path: string, data: {content?: string, embeds?: unknown[]}) {
     return fetch(`https://discord.com/api/webhooks/${webhook_path}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
-    })
+        body: JSON.stringify(data),
+    });
 }

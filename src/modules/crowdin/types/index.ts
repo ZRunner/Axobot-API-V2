@@ -11,9 +11,9 @@ export interface CrowdinBatchEvents {
 }
 
 export function isFileEvent(object: AnyCrowdinEvent): object is CrowdinFileEvent {
-    return object.event.startsWith('file.');
+    return object.event.startsWith("file.");
 }
 
 export function isStringEvent(object: AnyCrowdinEvent): object is CrowdinStringEvent {
-    return object.event.startsWith('string.');
+    return object.event.startsWith("string.");
 }
