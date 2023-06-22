@@ -15,6 +15,7 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
+        "arrow-body-style": "warn",
         "arrow-spacing": [
             "warn",
             {
@@ -32,6 +33,7 @@
             "error",
             "1tbs"
         ],
+        "camelcase": "warn",
         "comma-dangle": [
             "warn",
             "always-multiline"
@@ -42,17 +44,25 @@
             "multi-line",
             "consistent"
         ],
+        "default-param-last": "error",
         "dot-location": [
             "error",
             "property"
         ],
+        "eqeqeq": "error",
+        "func-call-spacing": "error",
+        "guard-for-in": "error",
+        "key-spacing": "warn",
         "keyword-spacing": "error",
+        "lines-between-class-members": "warn",
         "max-statements-per-line": [
             "error",
             {
                 "max": 2
             }
         ],
+        "new-parens": "error",
+        "no-confusing-arrow": "warn",
         "no-empty-function": "error",
         "no-floating-decimal": "error",
         "no-inline-comments": "error",
@@ -66,6 +76,9 @@
                 "maxBOF": 0
             }
         ],
+        "no-return-assign": "error",
+        "no-unneeded-ternary": "warn",
+        "no-useless-return": "error",
         "no-shadow": [
             "error",
             {
@@ -80,6 +93,7 @@
             "error"
         ],
         "no-var": "error",
+        "no-whitespace-before-property": "error",
         "object-curly-spacing": [
             "warn",
             "always"

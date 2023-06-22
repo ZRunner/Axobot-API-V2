@@ -8,6 +8,7 @@ import { CrowdinProject, CrowdinUser } from "./types/commons";
 export function footerFromUser(user: CrowdinUser) {
     return {
         name: `Translated by ${user.username}`,
+        // eslint-disable-next-line camelcase
         icon_url: user.avatarUrl,
     };
 }
@@ -26,12 +27,12 @@ export function authorFromProject(project: CrowdinProject) {
 
 /**
  * Sends a message to a Discord webhook
- * @param webhook_path The webhook path
+ * @param webhookPath The webhook path
  * @param data The message to send
  * @returns The webhook response
  */
-export function sendToDiscord(webhook_path: string, data: {content?: string, embeds?: unknown[]}) {
-    return fetch(`https://discord.com/api/webhooks/${webhook_path}`, {
+export function sendToDiscord(webhookPath: string, data: {content?: string, embeds?: unknown[]}) {
+    return fetch(`https://discord.com/api/webhooks/${webhookPath}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
