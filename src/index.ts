@@ -6,6 +6,8 @@ import DockerRouter from "./modules/docker/router";
 
 const app = express();
 
+const port = process.env.PORT || 3000;
+
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
@@ -15,6 +17,6 @@ app.get("/", (req, res) => {
 app.use("/crowdin", CrowdinRouter);
 app.use("/docker", DockerRouter);
 
-app.listen(3000, () => {
-    console.info(`App V${process.env.npm_package_version} is running on http://localhost:3000 !`);
+app.listen(port, () => {
+    console.info(`App V${process.env.npm_package_version} is running on http://localhost:${port} !`);
 });
