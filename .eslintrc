@@ -6,7 +6,8 @@
         "es6": true
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "simple-import-sort"
     ],
     "extends": [
         "eslint:recommended",
@@ -92,6 +93,8 @@
             "error",
             "always"
         ],
+        "simple-import-sort/imports": "error",
+        "simple-import-sort/exports": "error",
         "space-before-blocks": "error",
         "space-before-function-paren": [
             "error",

@@ -1,5 +1,6 @@
-import express from "express";
 import bodyParser from "body-parser";
+import express from "express";
+
 import CrowdinRouter from "./modules/crowdin/router";
 
 const app = express();

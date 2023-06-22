@@ -1,4 +1,4 @@
-import { CrowdinUser, CrowdinProject } from "./types/commons";
+import { CrowdinProject, CrowdinUser } from "./types/commons";
 
 /**
  * Generate an embed footer from a Crowdin user

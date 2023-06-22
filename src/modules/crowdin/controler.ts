@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { AnyCrowdinEvent, CrowdinBatchEvents, CrowdinFileEvent, CrowdinStringEvent, isFileEvent } from "./types";
-import { authorFromProject, footerFromUser, sendToDiscord } from "./utils";
+
 import { MapWithDefault } from "../../utils/defaut_map";
-import { CrowdinFileAddedEvent, CrowdinFileFullyTranslatedEvent, CrowdinFileUpdatedEvent, CrowdinSourceStringAddedEvent, CrowdinSourceStringUpdatedEvent, CrowdinSourceStringDeletedEvent } from "./types/events";
+import { AnyCrowdinEvent, CrowdinBatchEvents, CrowdinFileEvent, CrowdinStringEvent, isFileEvent } from "./types";
+import { CrowdinFileAddedEvent, CrowdinFileFullyTranslatedEvent, CrowdinFileUpdatedEvent, CrowdinSourceStringAddedEvent, CrowdinSourceStringDeletedEvent, CrowdinSourceStringUpdatedEvent } from "./types/events";
+import { authorFromProject, footerFromUser, sendToDiscord } from "./utils";
 
 const EMBED_COLOR = 0x66bb6a;
 
