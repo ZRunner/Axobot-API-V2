@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import CrowdinRouter from "./modules/crowdin/router";
+import DockerRouter from "./modules/docker/router";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/crowdin", CrowdinRouter);
+app.use("/docker", DockerRouter);
 
 app.listen(3000, () => {
     console.info(`App V${process.env.npm_package_version} is running on http://localhost:3000 !`);
