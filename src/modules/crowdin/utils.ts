@@ -1,3 +1,5 @@
+import { CrowdinUser, CrowdinProject } from "./types/commons"
+
 /**
  * Generate an embed footer from a Crowdin user
  * @param user The Crowdin user
@@ -28,7 +30,7 @@ export function authorFromProject(project: CrowdinProject) {
  * @param data The message to send
  * @returns The webhook response
  */
-export function sendToDiscord(webhook_path: string, data: {content?: string, embed?: unknown}) {
+export function sendToDiscord(webhook_path: string, data: {content?: string, embeds?: unknown[]}) {
     return fetch(`https://discord.com/api/webhooks/${webhook_path}`, {
         method: 'POST',
         headers: {

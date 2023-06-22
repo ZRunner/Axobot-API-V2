@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AnyCrowdinEvent, CrowdinBatchEvents, CrowdinFileEvent, CrowdinStringEvent, isFileEvent } from './types';
 import { authorFromProject, footerFromUser, sendToDiscord } from './utils';
 import { MapWithDefault } from '../../utils/defaut_map';
+import { CrowdinFileAddedEvent, CrowdinFileFullyTranslatedEvent, CrowdinFileUpdatedEvent, CrowdinSourceStringAddedEvent, CrowdinSourceStringUpdatedEvent, CrowdinSourceStringDeletedEvent } from './types/events';
 
 const EMBED_COLOR = 0x66bb6a;
 
@@ -54,7 +55,7 @@ async function handleFileAddedEvent(webhook_path: string, event: CrowdinFileAdde
         footer: footerFromUser(event.user),
         author: authorFromProject(event.file.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 async function handleFileTranslatedEvent(webhook_path: string, event: CrowdinFileFullyTranslatedEvent) {
@@ -65,7 +66,7 @@ async function handleFileTranslatedEvent(webhook_path: string, event: CrowdinFil
         color: EMBED_COLOR,
         author: authorFromProject(event.file.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 async function handleFileUpdatedEvent(webhook_path: string, event: CrowdinFileUpdatedEvent) {
@@ -77,7 +78,7 @@ async function handleFileUpdatedEvent(webhook_path: string, event: CrowdinFileUp
         footer: footerFromUser(event.user),
         author: authorFromProject(event.file.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 
@@ -142,7 +143,7 @@ async function handleBatchStringsUpdate(webhook_path: string, events: CrowdinStr
         footer: footerFromUser(events[0].user),
         author: authorFromProject(project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 async function handleStringAdded(webhook_path: string, event: CrowdinSourceStringAddedEvent) {
@@ -157,7 +158,7 @@ async function handleStringAdded(webhook_path: string, event: CrowdinSourceStrin
         footer: footerFromUser(event.user),
         author: authorFromProject(event.string.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 async function handleStringUpdated(webhook_path: string, event: CrowdinSourceStringUpdatedEvent) {
@@ -172,7 +173,7 @@ async function handleStringUpdated(webhook_path: string, event: CrowdinSourceStr
         footer: footerFromUser(event.user),
         author: authorFromProject(event.string.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 
 async function handleStringDeleted(webhook_path: string, event: CrowdinSourceStringDeletedEvent) {
@@ -187,6 +188,6 @@ async function handleStringDeleted(webhook_path: string, event: CrowdinSourceStr
         footer: footerFromUser(event.user),
         author: authorFromProject(event.string.project)
     }
-    await sendToDiscord(webhook_path, { embed });
+    await sendToDiscord(webhook_path, { embeds: [embed] });
 }
 

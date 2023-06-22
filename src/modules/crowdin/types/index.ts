@@ -1,3 +1,5 @@
+import { CrowdinFileAddedEvent, CrowdinFileFullyTranslatedEvent, CrowdinFileUpdatedEvent, CrowdinSourceStringAddedEvent, CrowdinSourceStringUpdatedEvent, CrowdinSourceStringDeletedEvent } from "./events";
+
 export type CrowdinFileEvent = CrowdinFileAddedEvent | CrowdinFileFullyTranslatedEvent | CrowdinFileUpdatedEvent;
 
 export type CrowdinStringEvent = CrowdinSourceStringAddedEvent | CrowdinSourceStringUpdatedEvent | CrowdinSourceStringDeletedEvent;

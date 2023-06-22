@@ -1,4 +1,4 @@
-interface CrowdinProject {
+export interface CrowdinProject {
     id: string;
     userId: string;
     sourceLanguageId: string;
@@ -16,7 +16,7 @@ interface CrowdinProject {
     publicDownloads: boolean;
 }
 
-interface CrowdinFile {
+export interface CrowdinFile {
     id: string;
     name: string;
     title: string;
@@ -29,14 +29,14 @@ interface CrowdinFile {
     project: Project
 }
 
-interface CrowdinUser {
+export interface CrowdinUser {
     id: string;
     username: string;
     fullName: string;
     avatarUrl: string;
 }
 
-interface CrowdinString {
+export interface CrowdinString {
     id: string;
     identifier: string;
     key: string;
