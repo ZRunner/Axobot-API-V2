@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 
+import { DiscordMessage } from "../../utils/discord_message";
 import { DockerPushEvent } from "./types";
 
 const EMBED_COLOR = 0x7289DA;
 
-function sendToDiscord(webhookPath: string, data: {content?: string, embeds?: unknown[]}) {
+function sendToDiscord(webhookPath: string, data: DiscordMessage) {
     return fetch(`https://discord.com/api/webhooks/${webhookPath}`, {
         method: "POST",
         headers: {

@@ -1,3 +1,4 @@
+import { DiscordMessage } from "../../utils/discord_message";
 import { CrowdinProject, CrowdinUser } from "./types/commons";
 
 /**
@@ -7,7 +8,7 @@ import { CrowdinProject, CrowdinUser } from "./types/commons";
  */
 export function footerFromUser(user: CrowdinUser) {
     return {
-        name: `Translated by ${user.username}`,
+        text: `Translated by ${user.username}`,
         // eslint-disable-next-line camelcase
         icon_url: user.avatarUrl,
     };
@@ -31,7 +32,7 @@ export function authorFromProject(project: CrowdinProject) {
  * @param data The message to send
  * @returns The webhook response
  */
-export function sendToDiscord(webhookPath: string, data: {content?: string, embeds?: unknown[]}) {
+export function sendToDiscord(webhookPath: string, data: DiscordMessage) {
     if (!/^\d+\/\w+$/.test(webhookPath)) {
         return Promise.reject(new Error("Invalid webhook path"));
     }
