@@ -8,7 +8,7 @@ import { CrowdinProject, CrowdinUser } from "./types/commons";
  */
 export function footerFromUser(user: CrowdinUser) {
     return {
-        text: `Translated by ${user.username}`,
+        text: `Pushed by ${user.username}`,
         // eslint-disable-next-line camelcase
         icon_url: user.avatarUrl,
     };
