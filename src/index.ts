@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import ConsoleStamp from "console-stamp";
 import dotenv from "dotenv";
+dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan"; // console log every request
 
@@ -13,12 +14,11 @@ import { checkEnvironmentVariables } from "./utils/env_checks";
 
 const app = express();
 
-dotenv.config();
-const port = process.env.PORT || 3000;
-
 if (!checkEnvironmentVariables()) {
     process.exit(1);
 }
+
+const port = Number(process.env.PORT) || 3000;
 
 // custom console log format
 ConsoleStamp(console, {
