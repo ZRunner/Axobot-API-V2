@@ -63,7 +63,15 @@
         ],
         "new-parens": "error",
         "no-confusing-arrow": "warn",
-        "no-empty-function": "error",
+        "no-empty-function": "off",
+        "@typescript-eslint/no-empty-function": [
+            "error",
+            {
+                "allow": [
+                    "private-constructors"
+                ]
+            }
+        ],
         "no-floating-decimal": "error",
         "no-lonely-if": "warn",
         "no-multi-spaces": "error",
