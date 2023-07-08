@@ -23,7 +23,11 @@ const DB_CONFIG: Omit<PoolConfig, "database"> = {
 };
 
 export default class Database {
-    static instance: Database;
+    private static instance: Database;
+
+    private axobotPool: Pool;
+
+    private apiPool: Pool;
 
     public static getInstance(): Database {
         if (!Database.instance) {
@@ -31,10 +35,6 @@ export default class Database {
         }
         return Database.instance;
     }
-
-    private axobotPool: Pool;
-
-    private apiPool: Pool;
 
     private constructor(config: Omit<PoolConfig, "database">) {
         this.axobotPool = createPool({ ...config, database: "axobot" });
