@@ -1,11 +1,12 @@
 import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
-const DB_CONFIG: PoolConfig = {
+const DB_CONFIG: Omit<PoolConfig, "database"> = {
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     port: process.env.DATABASE_PORT && Number(process.env.DATABASE_PORT),
     timezone: "auto",
+
     "typeCast": function castField(field, useDefaultTypeCasting) {
         // We only want to cast bit fields that have a single-bit in them. If the field
         // has more than one bit, then we cannot assume it is supposed to be a Boolean.
@@ -33,8 +34,11 @@ export default class Database {
 
     private axobotPool: Pool;
 
-    private constructor(config: PoolConfig) {
-        this.axobotPool = createPool(config);
+    private apiPool: Pool;
+
+    private constructor(config: Omit<PoolConfig, "database">) {
+        this.axobotPool = createPool({ ...config, database: "axobot" });
+        this.apiPool = createPool({ ...config, database: "axobot-api" });
     }
 
 }
