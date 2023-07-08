@@ -65,7 +65,6 @@
         "no-confusing-arrow": "warn",
         "no-empty-function": "error",
         "no-floating-decimal": "error",
-        "no-inline-comments": "error",
         "no-lonely-if": "warn",
         "no-multi-spaces": "error",
         "no-multiple-empty-lines": [
