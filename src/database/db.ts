@@ -1,10 +1,13 @@
 import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
+const BETA = process.env.DISCORD_ENTITY_ID === "1";
+
 const DB_CONFIG: Omit<PoolConfig, "database"> = {
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    port: process.env.DATABASE_PORT && Number(process.env.DATABASE_PORT),
+    port: process.env.DATABASE_PORT ? Number(process.env.DATABASE_PORT) : undefined,
+    trace: BETA,
     timezone: "auto",
 
     "typeCast": function castField(field, useDefaultTypeCasting) {
@@ -47,6 +50,16 @@ export default class Database {
 
     public async dummyApiQuery(): Promise<void> {
         await this.apiPool.query("SELECT 1");
+    }
+
+    public async getGuildConfig(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
+        const result = await this.axobotPool.query<{ option_name: string, value: string }[]>("SELECT `option_name`, `value` FROM `serverconfig` WHERE `guild_id` = ? AND `beta` = ?", [guildId, BETA]);
+        return result;
+    }
+
+    public async getGuildConfigValue(guildId: bigint, optionName: string): Promise<string | undefined> {
+        const result = await this.axobotPool.query<{ value: string }[]>("SELECT  `value` FROM `serverconfig` WHERE `guild_id` = ? AND `option_name` = ? AND `beta` = ?", [guildId, optionName, BETA]);
+        return result[0]?.value;
     }
 
 }
