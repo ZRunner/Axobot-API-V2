@@ -6,6 +6,7 @@ import morgan from "morgan"; // console log every request
 
 import AuthRouter from "./modules/auth/router";
 import CrowdinRouter from "./modules/crowdin/router";
+import DiscordRouter from "./modules/discord/router";
 import DockerRouter from "./modules/docker/router";
 import { formatDate } from "./utils/date_formatter";
 import { checkEnvironmentVariables } from "./utils/env_checks";
@@ -53,6 +54,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", AuthRouter);
 app.use("/crowdin", CrowdinRouter);
+app.use("/discord", DiscordRouter);
 app.use("/docker", DockerRouter);
 
 app.listen(port, () => {
