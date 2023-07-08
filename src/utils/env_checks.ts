@@ -18,9 +18,23 @@ export function checkEnvironmentVariables() {
         return false;
     }
 
+    if (process.env.PORT && isNaN(Number(process.env.PORT))) {
+        console.error("FATAL ERROR: PORT is not a number");
+        return false;
+    }
+    process.env.PORT = process.env.PORT ? Number(process.env.PORT) : undefined;
+
     if (process.env.DATABASE_PORT && isNaN(Number(process.env.DATABASE_PORT))) {
         console.error("FATAL ERROR: DATABASE_PORT is not a number");
         return false;
     }
+    process.env.DATABASE_PORT = process.env.DATABASE_PORT && Number(process.env.DATABASE_PORT);
+
+    if (![0, 1, 2].includes(Number(process.env.DISCORD_ENTITY_ID))) {
+        console.error("FATAL ERROR: DISCORD_ENTITY_ID is not 0, 1 or 2");
+        return false;
+    }
+    process.env.DISCORD_ENTITY_ID = Number(process.env.DISCORD_ENTITY_ID) as 0 | 1 | 2;
+    process.env.BETA = process.env.DISCORD_ENTITY_ID === 0;
     return true;
 }
