@@ -1,16 +1,23 @@
 import bodyParser from "body-parser";
 import ConsoleStamp from "console-stamp";
-// import dateformat from "dateformat";
+import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan"; // console log every request
 
+import AuthRouter from "./modules/auth/router";
 import CrowdinRouter from "./modules/crowdin/router";
 import DockerRouter from "./modules/docker/router";
 import { formatDate } from "./utils/date_formatter";
+import { checkEnvironmentVariables } from "./utils/env_checks";
 
 const app = express();
 
+dotenv.config();
 const port = process.env.PORT || 3000;
+
+if (!checkEnvironmentVariables()) {
+    process.exit(1);
+}
 
 // custom console log format
 ConsoleStamp(console, {
@@ -44,6 +51,7 @@ app.get("/", (req, res) => {
     res.send("Hello world!");
 });
 
+app.use("/auth", AuthRouter);
 app.use("/crowdin", CrowdinRouter);
 app.use("/docker", DockerRouter);
 
