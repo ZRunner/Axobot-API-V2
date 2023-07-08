@@ -41,4 +41,12 @@ export default class Database {
         this.apiPool = createPool({ ...config, database: "axobot-api" });
     }
 
+    public async dummyAxobotQuery(): Promise<void> {
+        await this.axobotPool.query("SELECT 1");
+    }
+
+    public async dummyApiQuery(): Promise<void> {
+        await this.apiPool.query("SELECT 1");
+    }
+
 }
