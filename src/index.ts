@@ -21,7 +21,7 @@ if (!checkEnvironmentVariables()) {
 
 // custom console log format
 ConsoleStamp(console, {
-    format: ":date(dd/mm/yyyy HH:MM:ss).blue :label(7)",
+    format: ":date(dd/mm/yyyy HH:MM:ss).blueBright :label(7)",
     extend: {
         debug: 5,
         fatal: 0,
@@ -44,7 +44,7 @@ app.use(function(error: Error, req: Request, res: Response, next: NextFunction) 
 // log every request to the console
 morgan.token("date", (req) => formatDate(req._startTime));
 morgan.token("err", (req, res) => (res._err ? ` - [${res._err}]` : "\u200b"));
-app.use(morgan("\x1b[34m[:date]\x1b[0m :method :status :url:err - :response-time ms"));
+app.use(morgan("\x1b[94m[:date]\x1b[0m :method :status :url:err - :response-time ms"));
 
 
 app.get("/", (req, res) => {
