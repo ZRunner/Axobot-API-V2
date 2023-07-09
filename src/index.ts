@@ -33,14 +33,6 @@ ConsoleStamp(console, {
 
 app.use(bodyParser.json());
 
-// Middleware to return a clean error message when the body is not a valid JSON
-app.use(function(error: Error, req: Request, res: Response, next: NextFunction) {
-    if (error instanceof SyntaxError) {
-        res.status(400).send("Invalid JSON body");
-    } else {
-        next();
-    }
-});
 
 // log every request to the console
 morgan.token("date", (req) => formatDate(req._startTime));
@@ -56,6 +48,17 @@ app.use("/auth", AuthRouter);
 app.use("/crowdin", CrowdinRouter);
 app.use("/discord", DiscordRouter);
 app.use("/docker", DockerRouter);
+
+// Middleware to return a clean error message when the body is not a valid JSON
+app.use(function(error: Error, req: Request, res: Response, next: NextFunction) {
+    console.debug("went there");
+    if (error instanceof SyntaxError) {
+        res.status(400).send("Invalid JSON body");
+    } else {
+        console.error(error.stack);
+        res.status(500).send("Internal server error");
+    }
+});
 
 app.listen(port, () => {
     console.info(`App V${process.env.npm_package_version} is running on http://localhost:${port} !`);
