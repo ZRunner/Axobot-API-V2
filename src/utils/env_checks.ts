@@ -7,6 +7,7 @@ const requiredEnvVariables = [
     "DATABASE_HOST",
     "DATABASE_USER",
     "DATABASE_PASSWORD",
+    "JWT_SECRET_TOKEN",
 ];
 
 /**
@@ -32,6 +33,11 @@ export function checkEnvironmentVariables() {
 
     if (![0, 1, 2].includes(Number(process.env.DISCORD_ENTITY_ID))) {
         console.error("FATAL ERROR: DISCORD_ENTITY_ID is not 0, 1 or 2");
+        return false;
+    }
+
+    if (process.env.JWT_SECRET_TOKEN.length < 15) {
+        console.error("FATAL ERROR: JWT_SECRET_TOKEN is too short");
         return false;
     }
 

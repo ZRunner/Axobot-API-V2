@@ -21,6 +21,8 @@ declare global {
             DATABASE_PORT?: string;
             DATABASE_USER: string;
             DATABASE_PASSWORD: string;
+            JWT_SECRET_TOKEN: string;
+            JWT_TOKEN_EXPIRATION_DAYS?: string;
         }
     }
 }

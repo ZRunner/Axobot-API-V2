@@ -1,5 +1,7 @@
 import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
+import { TokenInformation } from "./models/auth";
+
 const BETA = process.env.DISCORD_ENTITY_ID === "1";
 
 const DB_CONFIG: Omit<PoolConfig, "database"> = {
@@ -65,6 +67,15 @@ export default class Database {
     public async getGlobalLeaderboard(limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
         const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?", [limit]);
         return result;
+    }
+
+    public async getTokenInformation(token: string): Promise<TokenInformation | null> {
+        const result = await this.apiPool.query<TokenInformation[]>("SELECT `user_id`, `token`, `created_at`, `expires_at` FROM `tokens` WHERE `token` = ?", [token]);
+        return result[0] ?? null;
+    }
+
+    public async registerToken(userId: bigint, token: string, expiresAt: Date): Promise<void> {
+        await this.apiPool.query("INSERT INTO `tokens` (`user_id`, `token`, `expires_at`) VALUES (?, ?, ?)", [userId, token, expiresAt]);
     }
 
 }
