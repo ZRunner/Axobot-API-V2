@@ -62,4 +62,9 @@ export default class Database {
         return result[0]?.value;
     }
 
+    public async getGlobalLeaderboard(limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
+        const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?", [limit]);
+        return result;
+    }
+
 }

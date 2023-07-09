@@ -1,11 +1,13 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
+import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
 import GuildConfigData from "../../database/guild-config";
 import { AllRepresentation } from "../../database/guild-config-types";
 
 const guildConfig = GuildConfigData.getInstance();
 const db = Database.getInstance();
+const discordClient = DiscordClient.getInstance();
 
 type ConfigValueType = AllRepresentation["default"];
 
@@ -34,4 +36,27 @@ export async function getGuildConfig(req: Request, res: Response) {
         }
     }
     res.send(config);
+}
+
+export async function getGlobalLeaderboard(req: Request, res: Response, next: NextFunction) {
+    let players;
+    try {
+        const leaderboard = await db.getGlobalLeaderboard();
+        players = await Promise.all(leaderboard.map(async entry => {
+            const user = await discordClient.resolveUser(entry.userID.toString());
+            return {
+                "user_id": entry.userID.toString(),
+                "xp": entry.xp.toString(),
+                "username": user?.tag ?? null,
+                "avatar": user?.displayAvatarURL() ?? null,
+            };
+        }));
+    } catch (e) {
+        next(e);
+        return;
+    }
+    res.send({
+        "guild": null,
+        players: players,
+    });
 }
