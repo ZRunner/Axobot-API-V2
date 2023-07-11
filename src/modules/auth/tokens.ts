@@ -41,15 +41,15 @@ export async function tokenCheckMiddleware(req: Request, res: Response, next: Ne
     }
 }
 
-export async function createToken(userId: bigint | string) {
+export async function createToken(userId: bigint | string, discordToken: string | null) {
     const numericUserId = BigInt(userId);
-    const token = sign({ result: numericUserId }, JWT_SECRET_TOKEN, { expiresIn: JWT_TOKEN_EXPIRATION_DAYS + "d" });
+    const apiToken = sign({ result: userId.toString() }, JWT_SECRET_TOKEN, { expiresIn: JWT_TOKEN_EXPIRATION_DAYS + "d" });
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + JWT_TOKEN_EXPIRATION_DAYS);
     try {
-        await db.registerToken(numericUserId, token, expirationDate);
+        await db.registerToken(numericUserId, apiToken, discordToken, expirationDate);
     } catch (err) {
         return null;
     }
-    return token;
+    return apiToken;
 }

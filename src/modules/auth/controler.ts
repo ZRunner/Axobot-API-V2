@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { createToken } from "./tokens";
 
@@ -19,7 +19,7 @@ function isGetMeErrorResponse(obj: unknown): obj is GetmeErrorResponse {
     return typeof obj === "object" && obj !== null && (obj as GetmeErrorResponse).message !== undefined;
 }
 
-export async function getDiscordCallback(req: Request, res: Response) {
+export async function getDiscordCallback(req: Request, res: Response, next: NextFunction) {
     const code = req.query.code;
     if (typeof code !== "string") {
         res.status(400).send("Invalid code");
@@ -40,7 +40,6 @@ export async function getDiscordCallback(req: Request, res: Response) {
             scope: "identify",
         }),
     }).then(fres => fres.json());
-    console.debug(token);
 
     const user: GetMeSuccessResponse | GetmeErrorResponse = await fetch("https://discord.com/api/users/@me", {
         headers: {
@@ -53,7 +52,13 @@ export async function getDiscordCallback(req: Request, res: Response) {
         return;
     }
 
-    const apiToken = await createToken(user.id);
+    let apiToken;
+    try {
+        apiToken = await createToken(user.id, token.access_token);
+    } catch (err) {
+        next(err);
+        return;
+    }
 
     res.json({ token: apiToken });
 }

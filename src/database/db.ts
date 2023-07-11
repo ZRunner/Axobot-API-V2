@@ -69,13 +69,13 @@ export default class Database {
         return result;
     }
 
-    public async getTokenInformation(token: string): Promise<TokenInformation | null> {
-        const result = await this.apiPool.query<TokenInformation[]>("SELECT `user_id`, `token`, `created_at`, `expires_at` FROM `tokens` WHERE `token` = ?", [token]);
+    public async getTokenInformation(apiToken: string): Promise<TokenInformation | null> {
+        const result = await this.apiPool.query<TokenInformation[]>("SELECT `user_id`, `api_token`, `discord_token`, `created_at`, `expires_at` FROM `tokens` WHERE `api_token` = ?", [apiToken]);
         return result[0] ?? null;
     }
 
-    public async registerToken(userId: bigint, token: string, expiresAt: Date): Promise<void> {
-        await this.apiPool.query("INSERT INTO `tokens` (`user_id`, `token`, `expires_at`) VALUES (?, ?, ?)", [userId, token, expiresAt]);
+    public async registerToken(userId: bigint, apiToken: string, discordToken: string | null, expiresAt: Date): Promise<void> {
+        await this.apiPool.query("INSERT INTO `tokens` (`user_id`, `api_token`, `discord_token`, `expires_at`) VALUES (?, ?, ?, ?)", [userId, apiToken, discordToken, expiresAt]);
     }
 
 }
