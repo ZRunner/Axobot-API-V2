@@ -33,7 +33,7 @@ export async function tokenCheckMiddleware(req: Request, res: Response, next: Ne
             res._err = "Authentication token is invalid";
             return res.status(401).json({ success: false, msg: res._err });
         }
-        // req.session.user = info;
+        res.locals.user = info;
         next();
     } catch (err) {
         res._err = "Database error";

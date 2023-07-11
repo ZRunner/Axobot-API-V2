@@ -1,3 +1,5 @@
+import { TokenInformation } from "./database/models/auth";
+
 declare module "http" {
     interface IncomingMessage {
         _startTime: Date
@@ -30,6 +32,9 @@ declare global {
 declare module "express" {
     interface Response {
         _err?: string
+        locals: {
+            user?: TokenInformation;
+        }
     }
 }
 

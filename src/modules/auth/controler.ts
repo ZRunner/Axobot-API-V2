@@ -62,3 +62,11 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
 
     res.json({ token: apiToken });
 }
+
+export async function getMe(req: Request, res: Response) {
+    if (res.locals.user === undefined) {
+        res.status(401).send("Invalid token");
+        return;
+    }
+    res.json({ "user_id": res.locals.user.user_id });
+}
