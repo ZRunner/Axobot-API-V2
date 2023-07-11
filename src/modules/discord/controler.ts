@@ -45,8 +45,8 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
         players = await Promise.all(leaderboard.map(async entry => {
             const user = await discordClient.resolveUser(entry.userID.toString());
             return {
-                "user_id": entry.userID.toString(),
-                "xp": entry.xp.toString(),
+                "user_id": entry.userID,
+                "xp": entry.xp,
                 "username": user?.tag ?? null,
                 "avatar": user?.displayAvatarURL() ?? null,
             };
