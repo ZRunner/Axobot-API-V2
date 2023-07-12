@@ -50,7 +50,8 @@ app.use(cors({
         if (allowedOrigins.indexOf(origin) === -1) {
           const msg = "The CORS policy for this site does not allow access from the specified Origin.";
           return callback(new Error(msg), false);
-        } return callback(null, true);
+        }
+        return callback(null, true);
       },
 }));
 
@@ -71,7 +72,7 @@ app.use(morgan("\x1b[94m[:date]\x1b[0m :method :status :url:err - :response-time
 
 
 app.get("/", (req, res) => {
-    res.send("Hello world!");
+    res.send({ success: true, version: process.env.npm_package_version });
 });
 
 app.use("/auth", AuthRouter);
