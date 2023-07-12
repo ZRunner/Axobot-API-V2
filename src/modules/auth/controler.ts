@@ -49,7 +49,7 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
 
     if (isGetMeErrorResponse(user)) {
         console.debug(user);
-        res.status(401).send("Invalid token");
+        res.status(500).send("Invalid token");
         return;
     }
 
