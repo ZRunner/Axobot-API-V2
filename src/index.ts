@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import ConsoleStamp from "console-stamp";
 import dotenv from "dotenv";
 dotenv.config();
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan"; // console log every request
 
@@ -30,6 +31,28 @@ ConsoleStamp(console, {
     include: ["debug", "info", "warn", "error", "fatal"],
     level: "debug",
 });
+
+// Set up CORS
+const allowedOrigins = [
+    "http://axobeta.zrunner.me",
+    "http://axobot.zrunner.me",
+];
+app.use(cors({
+    origin: function(origin, callback) { // allow requests with no origin
+        // (like mobile apps or curl requests)
+        if (!origin) {
+           return callback(null, true);
+        }
+        // allow localhost origin
+        if (/^http:\/\/localhost(:[0-9]+)?$/.test(origin)) {
+            return callback(null, true);
+        }
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        } return callback(null, true);
+      },
+}));
 
 // Allow BigInt in JSON responses
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
