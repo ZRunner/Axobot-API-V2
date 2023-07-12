@@ -48,6 +48,7 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
     }).then(fres => fres.json());
 
     if (isGetMeErrorResponse(user)) {
+        console.debug(user);
         res.status(401).send("Invalid token");
         return;
     }
@@ -60,7 +61,10 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
         return;
     }
 
-    res.json({ token: apiToken });
+    res.json({
+        "token": apiToken,
+        "user_id": user.id,
+    });
 }
 
 export async function getMe(req: Request, res: Response) {
