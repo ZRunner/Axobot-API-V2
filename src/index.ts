@@ -34,7 +34,7 @@ ConsoleStamp(console, {
 
 // Set up CORS
 app.use(cors({
-    origin: "http://axobeta.zrunner.me",
+    origin: "https://axobeta.zrunner.me",
 }));
 
 // Allow BigInt in JSON responses
