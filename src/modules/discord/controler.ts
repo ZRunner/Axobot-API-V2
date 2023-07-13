@@ -47,7 +47,7 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
             return {
                 "user_id": entry.userID,
                 "xp": entry.xp,
-                "username": user?.tag ?? null,
+                "username": user?.tag ?? null, // TODO: use displayName once d.js is updated
                 "avatar": user?.displayAvatarURL() ?? null,
             };
         }));
