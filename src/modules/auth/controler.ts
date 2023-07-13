@@ -5,7 +5,7 @@ import { createToken } from "./tokens";
 
 interface GetMeSuccessResponse {
     id: string;
-    avatar: string;
+    avatar: string | null;
     global_name: string;
     locale: string;
     public_flags: number;
@@ -69,7 +69,7 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
         id: user.id,
         username: user.username,
         globalName: user.global_name,
-        avatar: user.avatar,
+        avatar: discordClient.getAvatarUrlFromHash(user.avatar, user.id),
     };
 
     res.json(response);
@@ -86,7 +86,7 @@ export async function getMe(req: Request, res: Response) {
         id: user.id,
         username: user.username,
         globalName: user.username, // TODO: use globalName once d.js is updated
-        avatar: user.displayAvatarURL(),
+        avatar: discordClient.getAvatarUrlFromHash(user.avatar, user.id),
     };
     res.json(response);
 }

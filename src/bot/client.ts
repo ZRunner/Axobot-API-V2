@@ -32,4 +32,12 @@ export default class DiscordClient {
     public async resolveUser(userId: string) {
         return this.getClient().users.fetch(userId);
     }
+
+    public getAvatarUrlFromHash(hash: string | null, userId: string) {
+        if (hash === null) {
+            const index = (BigInt(userId) >> 22n) % 6n;
+            return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
+        }
+        return `https://cdn.discordapp.com/avatars/${userId}/${hash}.png`;
+    }
 }
