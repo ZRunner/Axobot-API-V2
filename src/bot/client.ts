@@ -18,7 +18,7 @@ export default class DiscordClient {
 
     public getClient(): Client {
         if (!this.client) {
-            this.client = new Client({ intents: [GatewayIntentBits.Guilds] });
+            this.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
             this.client.once(Events.ClientReady, c => {
                 console.log(`Ready! Logged in as ${c.user.tag}`);
             });
