@@ -1,11 +1,15 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
+import Database from "../database/db";
+import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
 export default class DiscordClient {
     private static instance: DiscordClient;
 
     private client: Client | null = null;
+
+    private db: Database = Database.getInstance();
 
     private constructor() {}
 
@@ -42,12 +46,36 @@ export default class DiscordClient {
         }
     }
 
-    public getAvatarUrlFromHash(hash: string | null, userId: string) {
+    public getAvatarUrlFromHash(hash: string | null, userId: bigint | string) {
         if (hash === null) {
             const index = (BigInt(userId) >> 22n) % 6n;
             return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
         }
         return `https://cdn.discordapp.com/avatars/${userId}/${hash}.png`;
+    }
+
+    public async getRawUserData(userId: bigint | string): Promise<DBRawUserData | null> {
+        let intUserId: bigint;
+        try {
+            intUserId = BigInt(userId);
+        } catch (err) {
+            return null;
+        }
+        const dbCache = await this.db.getUserDataFromCache([intUserId]);
+        if (dbCache.length === 1) {
+            return dbCache[0];
+        }
+        const user = await this.resolveUser(userId.toString());
+        if (user === null) {
+            return null;
+        }
+        return {
+            "user_id": intUserId,
+            "username": user.username,
+            "global_name": user.username,
+            "avatar_hash": user.avatar,
+            "is_bot": user.bot,
+        };
     }
 
     public async resolveGuild(guildId: string) {

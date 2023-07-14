@@ -1,6 +1,7 @@
 import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
 import { TokenInformation } from "./models/auth";
+import { DBRawUserData } from "./models/users";
 
 const BETA = process.env.DISCORD_ENTITY_ID === "1";
 
@@ -46,14 +47,6 @@ export default class Database {
         this.apiPool = createPool({ ...config, database: "axobot-api" });
     }
 
-    public async dummyAxobotQuery(): Promise<void> {
-        await this.axobotPool.query("SELECT 1");
-    }
-
-    public async dummyApiQuery(): Promise<void> {
-        await this.apiPool.query("SELECT 1");
-    }
-
     public async getGuildConfig(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
         const result = await this.axobotPool.query<{ option_name: string, value: string }[]>("SELECT `option_name`, `value` FROM `serverconfig` WHERE `guild_id` = ? AND `beta` = ?", [guildId, BETA]);
         return result;
@@ -68,6 +61,12 @@ export default class Database {
         const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
         return result;
     }
+
+    public async getUserDataFromCache(userIds: bigint[]): Promise<DBRawUserData[]> {
+        const result = await this.axobotPool.query("SELECT `user_id`, `username`, `global_name`, `avatar_hash`, `is_bot` from `users_cache` WHERE `user_id` IN (?)", [userIds]);
+        return result;
+    }
+
 
     public async getTokenInformation(apiToken: string): Promise<TokenInformation | null> {
         const result = await this.apiPool.query<TokenInformation[]>("SELECT `user_id`, `api_token`, `discord_token`, `created_at`, `expires_at` FROM `tokens` WHERE `api_token` = ?", [apiToken]);

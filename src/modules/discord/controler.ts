@@ -49,13 +49,13 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
     try {
         const leaderboard = await db.getGlobalLeaderboard(page, limit);
         players = await Promise.all(leaderboard.map(async (entry, index) => {
-            const user = await discordClient.resolveUser(entry.userID.toString());
+            const user = await discordClient.getRawUserData(entry.userID.toString());
             return {
                 "ranking": page * limit + index + 1,
                 "user_id": entry.userID,
                 "xp": entry.xp,
-                "username": user?.tag ?? null, // TODO: use displayName once d.js is updated
-                "avatar": user?.displayAvatarURL() ?? null,
+                "username": user?.global_name ?? null,
+                "avatar": discordClient.getAvatarUrlFromHash(user?.avatar_hash ?? null, entry.userID),
             };
         }));
     } catch (e) {
