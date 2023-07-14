@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, Routes } from "discord.js";
+import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
@@ -61,16 +61,34 @@ export default class DiscordClient {
         }
     }
 
-    public async checkUserPresenceInGuild(userId: string, guildId: string) {
+    public async getMemberFromGuild(guildId: string, userId: string) {
+        const guild = await this.resolveGuild(guildId);
+        if (guild === null) {
+            return null;
+        }
+        let member;
         try {
-            await this.getClient().rest.get(Routes.guildMember(guildId, userId));
+            member = await guild.members.fetch(userId);
         } catch (err) {
-            if (isDiscordAPIError(err) && (["10004", "10013", "10007"].includes(err.code.toString()))) {
+            if (isDiscordAPIError(err) && (["10013", "10007"].includes(err.code.toString()))) {
                 // unknown guild, unknown user, unknown member
-                return false;
+                return null;
             }
             throw err;
         }
-        return true;
+        return member;
     }
+
+    public async checkUserPresenceInGuild(guildId: string, userId: string) {
+        return (await this.getMemberFromGuild(guildId, userId)) !== null;
+    }
+
+    public async checkUserPermissionInGuild(guildId: string, userId: string, permission: PermissionResolvable) {
+        const member = await this.getMemberFromGuild(guildId, userId);
+        if (member === null) {
+            return false;
+        }
+        return member.permissions.has(permission);
+    }
+
 }
