@@ -39,12 +39,19 @@ export async function getGuildConfig(req: Request, res: Response) {
 }
 
 export async function getGlobalLeaderboard(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.query.page as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 50;
+    if (page < 0 || limit < 0 || limit > 100) {
+        res.status(400).send("Invalid page or limit");
+        return;
+    }
     let players;
     try {
-        const leaderboard = await db.getGlobalLeaderboard();
-        players = await Promise.all(leaderboard.map(async entry => {
+        const leaderboard = await db.getGlobalLeaderboard(page, limit);
+        players = await Promise.all(leaderboard.map(async (entry, index) => {
             const user = await discordClient.resolveUser(entry.userID.toString());
             return {
+                "ranking": page * limit + index + 1,
                 "user_id": entry.userID,
                 "xp": entry.xp,
                 "username": user?.tag ?? null, // TODO: use displayName once d.js is updated
