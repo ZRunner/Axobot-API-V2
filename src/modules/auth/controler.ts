@@ -82,6 +82,10 @@ export async function getMe(req: Request, res: Response) {
     }
     const userId = res.locals.user.user_id;
     const user = await discordClient.resolveUser(userId.toString());
+    if (user === null) {
+        res.status(500).send("User not found");
+        return;
+    }
     const response: AuthenticatedUserObject = {
         id: user.id,
         username: user.username,
