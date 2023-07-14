@@ -28,7 +28,7 @@ ConsoleStamp(console, {
         debug: 5,
         fatal: 0,
     },
-    include: ["debug", "info", "warn", "error", "fatal"],
+    include: ["debug", "info", "log", "warn", "error", "fatal"],
     level: "debug",
 });
 
@@ -67,7 +67,6 @@ app.use("/docker", DockerRouter);
 
 // Middleware to return a clean error message when the body is not a valid JSON
 app.use(function(error: Error, req: Request, res: Response, next: NextFunction) {
-    console.debug("went there");
     if (error instanceof SyntaxError) {
         res.status(400).send("Invalid JSON body");
     } else {
