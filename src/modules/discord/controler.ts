@@ -57,7 +57,7 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
             return {
                 "ranking": page * limit + index,
                 "user_id": entry.userID,
-                "xp": entry.xp,
+                "xp": Number(entry.xp),
                 "level": level,
                 "xp_to_current_level": xpToCurrentLevel,
                 "xp_to_next_level": xpToNextLevel,
