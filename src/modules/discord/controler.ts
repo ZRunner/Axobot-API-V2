@@ -4,6 +4,7 @@ import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
 import GuildConfigData from "../../database/guild-config";
 import { AllRepresentation } from "../../database/guild-config-types";
+import { getLevelFromGeneralXp, getXpFromGeneralLevel } from "./xp";
 
 const guildConfig = GuildConfigData.getInstance();
 const db = Database.getInstance();
@@ -50,10 +51,16 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
         const leaderboard = await db.getGlobalLeaderboard(page, limit);
         players = await Promise.all(leaderboard.map(async (entry, index) => {
             const user = await discordClient.getRawUserData(entry.userID.toString());
+            const level = getLevelFromGeneralXp(Number(entry.xp));
+            const xpToCurrentLevel = getXpFromGeneralLevel(level);
+            const xpToNextLevel = getXpFromGeneralLevel(level + 1);
             return {
                 "ranking": page * limit + index,
                 "user_id": entry.userID,
                 "xp": entry.xp,
+                "level": level,
+                "xp_to_current_level": xpToCurrentLevel,
+                "xp_to_next_level": xpToNextLevel,
                 "username": user?.global_name ?? null,
                 "avatar": discordClient.getAvatarUrlFromHash(user?.avatar_hash ?? null, entry.userID),
             };
