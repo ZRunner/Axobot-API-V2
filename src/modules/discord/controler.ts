@@ -51,7 +51,7 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
         players = await Promise.all(leaderboard.map(async (entry, index) => {
             const user = await discordClient.getRawUserData(entry.userID.toString());
             return {
-                "ranking": page * limit + index + 1,
+                "ranking": page * limit + index,
                 "user_id": entry.userID,
                 "xp": entry.xp,
                 "username": user?.global_name ?? null,
