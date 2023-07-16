@@ -10,6 +10,6 @@ router.get("/default-guild-config", getDefaultGuildConfig);
 
 router.get("/guild/:guildId(\\d+)/config", tokenCheckMiddleware, isDiscordServerMember, getGuildConfig);
 
-router.get("/leaderboard/global", tokenCheckMiddleware, getGlobalLeaderboard);
+router.get("/leaderboard/global", getGlobalLeaderboard);
 
 export default router;
