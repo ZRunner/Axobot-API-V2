@@ -43,6 +43,15 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
             scope: "identify",
         }),
     }).then(fres => fres.json());
+    if (token.error) {
+        console.warn("Invalid answer while getting Discord token from code: ", token);
+        if (token.error_description === "Invalid \"code\" in request.") {
+            res.status(400).send("Invalid code");
+        } else {
+            res.status(500).send("Internal server error");
+        }
+        return;
+    }
 
     const user: GetMeSuccessResponse | GetmeErrorResponse = await fetch("https://discord.com/api/users/@me", {
         headers: {
