@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
+import rateLimit from "express-rate-limit";
 import morgan from "morgan"; // console log every request
 
 import AuthRouter from "./modules/auth/router";
@@ -48,6 +49,14 @@ BigInt.prototype.toJSON = function() {
   };
 
 app.use(bodyParser.json());
+
+// set-up global rate limit
+const globalLimiter = rateLimit({
+	windowMs: 10 * 1000, // 10 seconds
+	max: 15, // Limit each IP to 15 requests per windowMs
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+});
+app.use(globalLimiter);
 
 
 // log every request to the console
