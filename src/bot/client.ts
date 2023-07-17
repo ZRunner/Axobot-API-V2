@@ -28,6 +28,7 @@ export default class DiscordClient {
 
     public getClient(): Client {
         if (!this.client) {
+            console.debug("Creating new client");
             this.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
             this.client.once(Events.ClientReady, c => {
                 console.log(`Ready! Logged in as ${c.user.tag}`);
@@ -85,14 +86,7 @@ export default class DiscordClient {
     }
 
     public async resolveGuild(guildId: string) {
-        try {
-            return await this.getClient().guilds.fetch(guildId);
-        } catch (err) {
-            if (isDiscordAPIError(err) && err.code === 10004) {
-                return null;
-            }
-            throw err;
-        }
+        return this.getClient().guilds.resolve(guildId);
     }
 
     public async getMemberFromGuild(guildId: string, userId: string) {
@@ -130,7 +124,6 @@ export default class DiscordClient {
         if (guild === null) {
             return null;
         }
-        console.debug(guild.shard === undefined);
         const guildMembers = await guild.members.fetch();
         console.debug(guildMembers);
         return guild.members.fetch().then(members => members.map(member => BigInt(member.id)));
