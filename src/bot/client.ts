@@ -46,7 +46,14 @@ export default class DiscordClient {
 
     public async resolveUser(userId: string) {
         const client = await this.getClient();
-        return client.users.resolve(userId);
+        try {
+            return await client.users.fetch(userId);
+        } catch (err) {
+            if (isDiscordAPIError(err) && err.code === 10013) {
+                return null;
+            }
+            throw err;
+        }
     }
 
     public getAvatarUrlFromHash(hash: string | null, userId: bigint | string) {
@@ -83,7 +90,14 @@ export default class DiscordClient {
 
     public async resolveGuild(guildId: string) {
         const client = await this.getClient();
-        return client.guilds.resolve(guildId);
+        try {
+            return await client.guilds.fetch(guildId);
+        } catch (err) {
+            if (isDiscordAPIError(err) && err.code === 10004) {
+                return null;
+            }
+            throw err;
+        }
     }
 
     public async getMemberFromGuild(guildId: string, userId: string) {

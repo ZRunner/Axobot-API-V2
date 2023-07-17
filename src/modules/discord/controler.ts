@@ -78,7 +78,8 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
     }
     const guild = await discordClient.resolveGuild(guildId.toString());
     if (guild === null) {
-        res.status(404).send("Guild not found");
+        res._err = "Guild not found";
+        res.status(404).send(res._err);
         return;
     }
     const isXpEnabled = await discordClient.getGuildConfigValue(guildId, "enable_xp");

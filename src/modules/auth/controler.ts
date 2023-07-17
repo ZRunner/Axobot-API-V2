@@ -61,7 +61,8 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
 
     if (isGetMeErrorResponse(user)) {
         console.debug(user);
-        res.status(500).send("Invalid token");
+        res._err = "Invalid token";
+        res.status(500).send(res._err);
         return;
     }
 
@@ -86,13 +87,15 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
 
 export async function getMe(req: Request, res: Response) {
     if (res.locals.user === undefined) {
-        res.status(401).send("Invalid token");
+        res._err = "Invalid token";
+        res.status(401).send(res._err);
         return;
     }
     const userId = res.locals.user.user_id;
     const user = await discordClient.resolveUser(userId.toString());
     if (user === null) {
-        res.status(500).send("User not found");
+        res._err = "User not found";
+        res.status(500).send(res._err);
         return;
     }
     const response: AuthenticatedUserObject = {
