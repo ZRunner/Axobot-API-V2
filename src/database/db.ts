@@ -35,6 +35,8 @@ export default class Database {
 
     private apiPool: Pool;
 
+    private xpPool: Pool;
+
     public static getInstance(): Database {
         if (!Database.instance) {
             Database.instance = new Database(DB_CONFIG);
@@ -45,6 +47,7 @@ export default class Database {
     private constructor(config: Omit<PoolConfig, "database">) {
         this.axobotPool = createPool({ ...config, database: "axobot" });
         this.apiPool = createPool({ ...config, database: "axobot-api" });
+        this.xpPool = createPool({ ...config, database: "zbot-xp" });
     }
 
     public async getGuildConfig(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
@@ -52,13 +55,24 @@ export default class Database {
         return result;
     }
 
-    public async getGuildConfigValue(guildId: bigint, optionName: string): Promise<string | undefined> {
+    public async getGuildConfigValue(guildId: bigint, optionName: string): Promise<string | null> {
         const result = await this.axobotPool.query<{ value: string }[]>("SELECT  `value` FROM `serverconfig` WHERE `guild_id` = ? AND `option_name` = ? AND `beta` = ?", [guildId, optionName, BETA]);
-        return result[0]?.value;
+        return result[0]?.value ?? null;
     }
 
     public async getGlobalLeaderboard(page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
         const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
+        return result;
+    }
+
+    public async getFilteredGlobalLeaderboard(userIds: bigint[], page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
+        const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 AND `userID` IN (?) ORDER BY `xp` DESC LIMIT ?, ?", [userIds, page * limit, limit]);
+        return result;
+    }
+
+    public async getGuildLeaderboard(guildId: bigint, page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
+        console.debug("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?");
+        const result = await this.xpPool.query("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
         return result;
     }
 
