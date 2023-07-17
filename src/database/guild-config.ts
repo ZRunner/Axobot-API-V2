@@ -44,7 +44,7 @@ export default class GuildConfigData {
         }
         switch (option.type) {
             case "boolean":
-                return value === "true";
+                return value.toLowerCase() === "true";
             case "int":
             case "float":
                 return Number(value);
