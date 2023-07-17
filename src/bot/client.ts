@@ -17,6 +17,8 @@ export default class DiscordClient {
 
     private defaultGuildConfig: GuildConfigData = GuildConfigData.getInstance();
 
+    private fetchedGuildIds: Set<bigint> = new Set();
+
     private constructor() {}
 
     public static getInstance(): DiscordClient {
@@ -26,31 +28,25 @@ export default class DiscordClient {
         return DiscordClient.instance;
     }
 
-    public getClient(): Client {
+    public async getClient(): Promise<Client> {
         if (!this.client) {
             console.debug("Creating new client");
             this.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
             this.client.once(Events.ClientReady, c => {
                 console.log(`Ready! Logged in as ${c.user.tag}`);
             });
-            this.client.login(process.env.DISCORD_BOT_TOKEN);
+            await this.client.login(process.env.DISCORD_BOT_TOKEN);
         }
         return this.client;
     }
 
     public async logout() {
-        this.getClient().destroy();
+        this.client?.destroy();
     }
 
     public async resolveUser(userId: string) {
-        try {
-            return await this.getClient().users.fetch(userId);
-        } catch (err) {
-            if (isDiscordAPIError(err) && err.code === 10013) {
-                return null;
-            }
-            throw err;
-        }
+        const client = await this.getClient();
+        return client.users.resolve(userId);
     }
 
     public getAvatarUrlFromHash(hash: string | null, userId: bigint | string) {
@@ -86,7 +82,8 @@ export default class DiscordClient {
     }
 
     public async resolveGuild(guildId: string) {
-        return this.getClient().guilds.resolve(guildId);
+        const client = await this.getClient();
+        return client.guilds.resolve(guildId);
     }
 
     public async getMemberFromGuild(guildId: string, userId: string) {
@@ -119,14 +116,24 @@ export default class DiscordClient {
         return member.permissions.has(permission);
     }
 
-    public async getGuildMemberIds(guildId: string) {
+    public async getGuildMembers(guildId: string) {
         const guild = await this.resolveGuild(guildId);
         if (guild === null) {
             return null;
         }
-        const guildMembers = await guild.members.fetch();
-        console.debug(guildMembers);
-        return guild.members.fetch().then(members => members.map(member => BigInt(member.id)));
+        if (this.fetchedGuildIds.has(BigInt(guildId))) {
+            return guild.members.cache;
+        }
+        this.fetchedGuildIds.add(BigInt(guildId));
+        return await guild.members.fetch();
+    }
+
+    public async getGuildMemberIds(guildId: string) {
+        const members = await this.getGuildMembers(guildId);
+        if (members === null) {
+            return null;
+        }
+        return Array.from(members.keys());
     }
 
     public async getDefaultGuildConfig() {
@@ -135,7 +142,6 @@ export default class DiscordClient {
 
     public async getGuildConfig(guildId: bigint) {
         const setupOptions = await this.db.getGuildConfig(guildId);
-        console.debug(setupOptions);
         const defaultConfig = await this.defaultGuildConfig.getOptionsList();
         const config: {[key: string]: ConfigValueType} = {};
         for (const [optionName, value] of Object.entries(defaultConfig)) {
