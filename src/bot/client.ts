@@ -82,7 +82,7 @@ export default class DiscordClient {
         return {
             "user_id": intUserId,
             "username": user.username,
-            "global_name": user.username,
+            "global_name": user.globalName,
             "avatar_hash": user.avatar,
             "is_bot": user.bot,
         };

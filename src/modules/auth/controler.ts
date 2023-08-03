@@ -6,7 +6,7 @@ import { createToken } from "./tokens";
 interface GetMeSuccessResponse {
     id: string;
     avatar: string | null;
-    global_name: string;
+    global_name: string | null;
     locale: string;
     public_flags: number;
     username: string;
@@ -101,7 +101,7 @@ export async function getMe(req: Request, res: Response) {
     const response: AuthenticatedUserObject = {
         id: user.id,
         username: user.username,
-        globalName: user.username, // TODO: use globalName once d.js is updated
+        globalName: user.globalName,
         avatar: discordClient.getAvatarUrlFromHash(user.avatar, user.id),
     };
     res.json(response);

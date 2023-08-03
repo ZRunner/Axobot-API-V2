@@ -39,7 +39,7 @@ async function transformLeaderboard(leaderboard: {userID: bigint;xp: bigint;}[],
             "level": level,
             "xp_to_current_level": xpToCurrentLevel,
             "xp_to_next_level": xpToNextLevel,
-            "username": user?.global_name ?? null,
+            "username": user?.global_name ?? user?.username ?? null,
             "avatar": discordClient.getAvatarUrlFromHash(user?.avatar_hash ?? null, entry.userID),
         };
     }));
