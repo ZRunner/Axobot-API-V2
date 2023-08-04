@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 
 import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
-import { getLevelFromGeneralXp, getLevelFromMEE6Xp, getXpFromGeneralLevel, getXpFromMEE6Level } from "./xp";
+import { getGuildInfo, transformLeaderboard } from "./utils/leaderboard";
+
 
 const db = Database.getInstance();
 const discordClient = DiscordClient.getInstance();
@@ -24,27 +25,6 @@ export async function getGuildConfig(req: Request, res: Response) {
     res.send(config);
 }
 
-async function transformLeaderboard(leaderboard: {userID: bigint;xp: bigint;}[], firstRank: number, useMEE6: boolean) {
-    const getLevelFromXp = useMEE6 ? getLevelFromMEE6Xp : getLevelFromGeneralXp;
-    const getXpFromLevel = useMEE6 ? getXpFromMEE6Level : getXpFromGeneralLevel;
-    return await Promise.all(leaderboard.map(async (entry, index) => {
-        const user = await discordClient.getRawUserData(entry.userID.toString());
-        const level = getLevelFromXp(Number(entry.xp));
-        const xpToCurrentLevel = getXpFromLevel(level);
-        const xpToNextLevel = getXpFromLevel(level + 1);
-        return {
-            "ranking": firstRank + index,
-            "user_id": entry.userID,
-            "xp": Number(entry.xp),
-            "level": level,
-            "xp_to_current_level": xpToCurrentLevel,
-            "xp_to_next_level": xpToNextLevel,
-            "username": user?.global_name ?? user?.username ?? null,
-            "avatar": discordClient.getAvatarUrlFromHash(user?.avatar_hash ?? null, entry.userID),
-        };
-    }));
-}
-
 export async function getGlobalLeaderboard(req: Request, res: Response, next: NextFunction) {
     const page = parseInt(req.query.page as string) || 0;
     const limit = parseInt(req.query.limit as string) || 50;
@@ -52,17 +32,20 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
         res.status(400).send("Invalid page or limit");
         return;
     }
-    let players;
+    let players, playersCount;
     try {
         const leaderboard = await db.getGlobalLeaderboard(page, limit);
         players = await transformLeaderboard(leaderboard, page * limit, false);
+        playersCount = await db.getGlobalLeaderboardCount();
     } catch (e) {
         next(e);
         return;
     }
     res.send({
-        guild: null,
-        players: players,
+        "guild": null,
+        "players": players,
+        "players_count": playersCount,
+        "xp_type": "global",
     });
 }
 
@@ -87,8 +70,8 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
         res.status(400).send("XP is not enabled for this guild");
         return;
     }
-    const xpType = await discordClient.getGuildConfigValue(guildId, "xp_type");
-    let players;
+    const xpType = await discordClient.getGuildConfigValue(guildId, "xp_type") as string;
+    let players, playersCount;
     try {
         if (xpType === "global") {
             const stringMemberIds = await discordClient.getGuildMemberIds(guildId.toString());
@@ -99,16 +82,21 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
             const memberIds = stringMemberIds.map((id) => BigInt(id));
             const leaderboard = await db.getFilteredGlobalLeaderboard(memberIds, page, limit);
             players = await transformLeaderboard(leaderboard, page * limit, false);
+            playersCount = await db.getFilteredGlobalLeaderboardCount(memberIds);
         } else {
             const leaderboard = await db.getGuildLeaderboard(guildId, page, limit);
             players = await transformLeaderboard(leaderboard, page * limit, xpType === "mee6-like");
+            playersCount = await db.getGuildLeaderboardCount(guildId);
         }
     } catch (e) {
         next(e);
         return;
     }
+    const guildData = await getGuildInfo(guild);
     res.send({
-        guild: null,
-        players: players,
+        "guild": guildData,
+        "players": players,
+        "players_count": playersCount,
+        "xp_type": xpType,
     });
 }

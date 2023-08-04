@@ -65,15 +65,30 @@ export default class Database {
         return result;
     }
 
+    public async getGlobalLeaderboardCount(): Promise<number> {
+        const result = await this.axobotPool.query("SELECT COUNT(*) AS `count` FROM `xp` WHERE banned = 0");
+        return result[0].count;
+    }
+
     public async getFilteredGlobalLeaderboard(userIds: bigint[], page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
         const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 AND `userID` IN (?) ORDER BY `xp` DESC LIMIT ?, ?", [userIds, page * limit, limit]);
         return result;
+    }
+
+    public async getFilteredGlobalLeaderboardCount(userIds: bigint[]): Promise<number> {
+        const result = await this.axobotPool.query("SELECT COUNT(*) AS `count` FROM `xp` WHERE banned = 0 AND `userID` IN (?)", [userIds]);
+        return result[0].count;
     }
 
     public async getGuildLeaderboard(guildId: bigint, page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
         console.debug("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?");
         const result = await this.xpPool.query("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
         return result;
+    }
+
+    public async getGuildLeaderboardCount(guildId: bigint): Promise<number> {
+        const result = await this.xpPool.query("SELECT COUNT(*) AS `count` FROM `" + guildId + "` WHERE banned = 0");
+        return result[0].count;
     }
 
     public async getUserDataFromCache(userIds: bigint[]): Promise<DBRawUserData[]> {
