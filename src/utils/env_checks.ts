@@ -41,5 +41,10 @@ export function checkEnvironmentVariables() {
         return false;
     }
 
+    if (process.env.IS_BEHIND_PROXY && !["true", "false"].includes(process.env.IS_BEHIND_PROXY)) {
+        console.error("FATAL ERROR: IS_BEHIND_PROXY is not a boolean");
+        return false;
+    }
+
     return true;
 }

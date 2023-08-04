@@ -25,6 +25,7 @@ declare global {
             DATABASE_PASSWORD: string;
             JWT_SECRET_TOKEN: string;
             JWT_TOKEN_EXPIRATION_DAYS?: string;
+            IS_BEHIND_PROXY?: string;
         }
     }
 }

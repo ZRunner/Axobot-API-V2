@@ -20,6 +20,10 @@ if (!checkEnvironmentVariables()) {
     process.exit(1);
 }
 
+if (process.env.IS_BEHIND_PROXY) {
+    app.set("trust proxy", true);
+}
+
 const port = Number(process.env.PORT) || 3000;
 
 // custom console log format
