@@ -20,8 +20,8 @@ if (!checkEnvironmentVariables()) {
     process.exit(1);
 }
 
-if (process.env.IS_BEHIND_PROXY) {
-    app.set("trust proxy", true);
+if (process.env.PROXY_LEVEL && Number(process.env.PROXY_LEVEL) > 0) {
+    app.set("trust proxy", Number(process.env.PROXY_LEVEL));
 }
 
 const port = Number(process.env.PORT) || 3000;

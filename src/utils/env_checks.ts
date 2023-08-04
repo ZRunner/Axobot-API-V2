@@ -41,8 +41,8 @@ export function checkEnvironmentVariables() {
         return false;
     }
 
-    if (process.env.IS_BEHIND_PROXY && !["true", "false"].includes(process.env.IS_BEHIND_PROXY)) {
-        console.error("FATAL ERROR: IS_BEHIND_PROXY is not a boolean");
+    if (process.env.PROXY_LEVEL && isNaN(Number(process.env.PROXY_LEVEL))) {
+        console.error("FATAL ERROR: PROXY_LEVEL is not a number");
         return false;
     }
 
