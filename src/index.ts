@@ -66,7 +66,7 @@ app.use(globalLimiter);
 // log every request to the console
 morgan.token("date", (req) => formatDate(req._startTime));
 morgan.token("err", (req, res) => (res._err ? ` - [${res._err}]` : "\u200b"));
-app.use(morgan("\x1b[94m[:date]\x1b[0m :method :status :url:err - :response-time ms"));
+app.use(morgan("\x1b[94m[:date]\x1b[0m \x1b[93m:remote-addr\x1b[0m :method :status :url:err - :response-time ms"));
 
 
 app.get("/", (req, res) => {
