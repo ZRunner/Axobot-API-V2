@@ -17,7 +17,7 @@ export default class DiscordClient {
 
     private defaultGuildConfig: GuildConfigData = GuildConfigData.getInstance();
 
-    private fetchedGuildIds: Set<bigint> = new Set();
+    private fetchedGuildIds = new Set<bigint>();
 
     private constructor() {}
 
@@ -157,7 +157,7 @@ export default class DiscordClient {
     public async getGuildConfig(guildId: bigint) {
         const setupOptions = await this.db.getGuildConfig(guildId);
         const defaultConfig = await this.defaultGuildConfig.getOptionsList();
-        const config: {[key: string]: ConfigValueType} = {};
+        const config: Record<string, ConfigValueType> = {};
         for (const [optionName, value] of Object.entries(defaultConfig)) {
             const option = setupOptions.find((item) => item.option_name === optionName);
             if (option === undefined) {

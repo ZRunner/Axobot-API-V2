@@ -1,6 +1,6 @@
 import { AllRepresentation } from "./guild-config-types";
 
-type DefaultConfigurationMapType = {[key: string]: AllRepresentation}
+type DefaultConfigurationMapType = Record<string, AllRepresentation>;
 
 export default class GuildConfigData {
     private static instance: GuildConfigData;

@@ -11,9 +11,13 @@
     ],
     "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/stylistic"
     ],
+    "parserOptions": {
+        "project": true
+    },
     "rules": {
         "arrow-body-style": "warn",
         "arrow-spacing": [
@@ -85,6 +89,8 @@
         ],
         "no-return-assign": "error",
         "no-unneeded-ternary": "warn",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
         "no-useless-return": "error",
         "no-shadow": [
             "error",
