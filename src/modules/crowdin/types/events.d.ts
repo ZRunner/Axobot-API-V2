@@ -1,3 +1,5 @@
+import { CrowdinFile, CrowdinString, CrowdinUser } from "./commons";
+
 export interface CrowdinFileAddedEvent {
     event: "file.added";
     file: CrowdinFile;
