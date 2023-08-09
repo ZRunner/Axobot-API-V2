@@ -8,12 +8,15 @@ import { authorFromProject, footerFromUser, sendToDiscord } from "./utils";
 const EMBED_COLOR = 0x66bb6a;
 
 export async function postWebhookNotification(req: Request<{ webhook_id: string, webhook_token: string }, unknown, AnyCrowdinEvent | CrowdinBatchEvents>, res: Response) {
+    console.debug("Received crowdin webhook notification");
+    console.debug("body:", req.body);
     const webhookPath = req.params.webhook_id + "/" + req.params.webhook_token;
     // assign events to our lists
     const stringEvents: CrowdinStringEvent[] = [];
     const fileEvents: CrowdinFileEvent[] = [];
     if ("events" in req.body) {
         for (const event of req.body.events) {
+            console.debug("reading event:", event.event);
             if (isFileEvent(event)) {
                 fileEvents.push(event);
             } else {
@@ -27,10 +30,12 @@ export async function postWebhookNotification(req: Request<{ webhook_id: string,
     }
     // handle string events
     if (stringEvents.length > 0) {
+        console.debug("handling string events");
         await handleBatchStringsUpdate(webhookPath, stringEvents);
     }
     // handle file events
     for (const event of fileEvents) {
+        console.debug("handling file event:", event.event);
         switch (event.event) {
             case "file.added":
                 await handleFileAddedEvent(webhookPath, event);
@@ -43,6 +48,7 @@ export async function postWebhookNotification(req: Request<{ webhook_id: string,
                 break;
         }
     }
+    console.debug("done crowdin webhook notification");
     res.send("ok");
 }
 
