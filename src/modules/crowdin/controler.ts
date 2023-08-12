@@ -139,9 +139,9 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
     }
     console.debug("finished reading string events");
     let text = "";
-    for (const [eventType, file] of eventsMap.keys()) {
+    for (const [[eventType, file], event] of eventsMap.entries()) {
         console.debug("adding event", eventType, "in file", file, "to final text");
-        const strings = [...eventsMap.get([eventType, file])];
+        const strings = [...event];
         const _strings = strings.length === 1 ? "string" : "strings";
         text += `${strings.length} ${_strings} ${eventType} in ${file}\n`;
     }
