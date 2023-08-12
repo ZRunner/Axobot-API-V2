@@ -108,7 +108,9 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
     const project = events[0].string.project;
     // assign each string to its event category
     const eventsMap = new MapWithDefault<["added"|"updated"|"deleted", string], Set<string>>(() => new Set());
+    console.debug("created events map");
     for (const event of events) {
+        console.debug("reading string event", event.event, event.string);
         const file = event.string.file.path;
         const stringId = event.string.identifier;
         switch (event.event) {
@@ -135,13 +137,16 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
                 break;
         }
     }
+    console.debug("finished reading string events");
     let text = "";
     for (const [eventType, file] of eventsMap.keys()) {
+        console.debug("adding event", eventType, "in file", file, "to final text");
         const strings = [...eventsMap.get([eventType, file])];
         const _strings = strings.length === 1 ? "string" : "strings";
         text += `${strings.length} ${_strings} ${eventType} in ${file}\n`;
     }
     text += `\n[Go to project](${project.url})`;
+    console.debug("final text:", text);
     const _strings = events.length === 1 ? "string" : "strings";
     const embed = {
         title: `${events.length} ${_strings} edited`,
@@ -150,6 +155,8 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
         footer: footerFromUser(events[0].user),
         author: authorFromProject(project),
     };
+    console.debug("sending embed to discord");
+    console.debug(JSON.stringify(embed, null, 2));
     await sendToDiscord(webhookPath, { embeds: [embed] });
 }
 
