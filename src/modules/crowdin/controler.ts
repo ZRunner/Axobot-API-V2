@@ -8,15 +8,12 @@ import { authorFromProject, footerFromUser, sendToDiscord } from "./utils";
 const EMBED_COLOR = 0x66bb6a;
 
 export async function postWebhookNotification(req: Request<{ webhook_id: string, webhook_token: string }, unknown, AnyCrowdinEvent | CrowdinBatchEvents>, res: Response) {
-    console.debug("Received crowdin webhook notification");
-    console.debug("body:", req.body);
     const webhookPath = req.params.webhook_id + "/" + req.params.webhook_token;
     // assign events to our lists
     const stringEvents: CrowdinStringEvent[] = [];
     const fileEvents: CrowdinFileEvent[] = [];
     if ("events" in req.body) {
         for (const event of req.body.events) {
-            console.debug("reading event:", event.event);
             if (isFileEvent(event)) {
                 fileEvents.push(event);
             } else {
@@ -30,12 +27,10 @@ export async function postWebhookNotification(req: Request<{ webhook_id: string,
     }
     // handle string events
     if (stringEvents.length > 0) {
-        console.debug("handling string events");
         await handleBatchStringsUpdate(webhookPath, stringEvents);
     }
     // handle file events
     for (const event of fileEvents) {
-        console.debug("handling file event:", event.event);
         switch (event.event) {
             case "file.added":
                 await handleFileAddedEvent(webhookPath, event);
@@ -48,7 +43,6 @@ export async function postWebhookNotification(req: Request<{ webhook_id: string,
                 break;
         }
     }
-    console.debug("done crowdin webhook notification");
     res.send("ok");
 }
 
@@ -107,46 +101,44 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
     }
     const project = events[0].string.project;
     // assign each string to its event category
-    const eventsMap = new MapWithDefault<["added"|"updated"|"deleted", string], Set<string>>(() => new Set());
-    console.debug("created events map");
+    const eventsMap = new MapWithDefault<string, Set<string>>(() => new Set());
     for (const event of events) {
-        console.debug("reading string event", event.event, event.string);
         const file = event.string.file.path;
         const stringId = event.string.identifier;
         switch (event.event) {
             case "string.added":
                 // if the string has been marked as deleted, mark it as updated
-                if (eventsMap.get(["deleted", file]).has(stringId)) {
-                    eventsMap.get(["deleted", file]).delete(stringId);
-                    eventsMap.get(["updated", file]).add(stringId);
+                if (eventsMap.get("deleted-" + file).has(stringId)) {
+                    eventsMap.get("deleted-" + file).delete(stringId);
+                    eventsMap.get("updated-" + file).add(stringId);
                 } else {
-                    eventsMap.get(["added", file]).add(stringId);
+                    eventsMap.get("added-" + file).add(stringId);
                 }
                 break;
             case "string.updated":
-                eventsMap.get(["updated", file]).add(stringId);
+                eventsMap.get("updated-" + file).add(stringId);
                 break;
             case "string.deleted":
                 // if the string has been marked as added, mark it as updated
-                if (eventsMap.get(["added", file]).has(stringId)) {
-                    eventsMap.get(["added", file]).delete(stringId);
-                    eventsMap.get(["updated", file]).add(stringId);
+                if (eventsMap.get("added-" + file).has(stringId)) {
+                    eventsMap.get("added-" + file).delete(stringId);
+                    eventsMap.get("updated-" + file).add(stringId);
                 } else {
-                    eventsMap.get(["deleted", file]).add(stringId);
+                    eventsMap.get("deleted-" + file).add(stringId);
                 }
                 break;
         }
     }
-    console.debug("finished reading string events");
     let text = "";
-    for (const [[eventType, file], event] of eventsMap.entries()) {
+    for (const [eventKey, event] of eventsMap.entries()) {
+        if (event.size === 0) continue;
+        const [eventType, file] = eventKey.split("-", 2);
         console.debug("adding event", eventType, "in file", file, "to final text");
         const strings = [...event];
         const _strings = strings.length === 1 ? "string" : "strings";
         text += `${strings.length} ${_strings} ${eventType} in ${file}\n`;
     }
     text += `\n[Go to project](${project.url})`;
-    console.debug("final text:", text);
     const _strings = events.length === 1 ? "string" : "strings";
     const embed = {
         title: `${events.length} ${_strings} edited`,
@@ -155,8 +147,6 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
         footer: footerFromUser(events[0].user),
         author: authorFromProject(project),
     };
-    console.debug("sending embed to discord");
-    console.debug(JSON.stringify(embed, null, 2));
     await sendToDiscord(webhookPath, { embeds: [embed] });
 }
 
