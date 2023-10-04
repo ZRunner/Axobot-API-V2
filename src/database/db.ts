@@ -81,7 +81,6 @@ export default class Database {
     }
 
     public async getGuildLeaderboard(guildId: bigint, page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
-        console.debug("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?");
         const result = await this.xpPool.query("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
         return result;
     }
