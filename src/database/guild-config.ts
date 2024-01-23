@@ -18,14 +18,13 @@ export default class GuildConfigData {
 
     private async fetchOptionsList(): Promise<DefaultConfigurationMapType> {
         const url = "https://raw.githubusercontent.com/ZRunner/Axobot/develop/libs/serverconfig/options_list.json";
-
         try {
-        const response = await fetch(url);
-        const content = await response.text();
-        return JSON.parse(content);
+            const response = await fetch(url);
+            const content = await response.text();
+            return JSON.parse(content);
         } catch (error) {
-        console.error("Error fetching options list:", error);
-        throw error;
+            console.error("Error fetching options list:", error);
+            throw error;
         }
     }
 
