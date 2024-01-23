@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 
 import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
+import { tokenCheckMiddleware } from "../auth/tokens";
+import { isDiscordServerMember } from "./middlewares";
 import { getGuildInfo, transformLeaderboard } from "./utils/leaderboard";
 
 
@@ -69,6 +71,14 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
     if (!isXpEnabled) {
         res.status(400).send("XP is not enabled for this guild");
         return;
+    }
+    const isPrivateLeaderboard = await discordClient.getGuildConfigValue(guildId, "private_leaderboard");
+    if (isPrivateLeaderboard) {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const err = await tokenCheckMiddleware(req, res, () => {}) || await isDiscordServerMember(req, res, () => {});
+        if (err) {
+            return err;
+        }
     }
     const xpType = await discordClient.getGuildConfigValue(guildId, "xp_type") as string;
     let players, playersCount;
