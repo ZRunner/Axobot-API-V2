@@ -41,6 +41,7 @@ ConsoleStamp(console, {
 app.use(cors({
     origin: [
         "https://axobeta.zrunner.me",
+        "https://axobot.xyz",
         "http://localhost:3005",
     ],
 }));
