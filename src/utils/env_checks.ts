@@ -5,6 +5,7 @@ const requiredEnvVariables = [
     "DISCORD_ENTITY_ID",
     "DISCORD_BOT_TOKEN",
     "DATABASE_HOST",
+    "DATABASE_NAME",
     "DATABASE_USER",
     "DATABASE_PASSWORD",
     "JWT_SECRET_TOKEN",

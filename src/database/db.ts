@@ -5,8 +5,9 @@ import { DBRawUserData } from "./models/users";
 
 const BETA = process.env.DISCORD_ENTITY_ID === "1";
 
-const DB_CONFIG: Omit<PoolConfig, "database"> = {
+const DB_CONFIG: PoolConfig = {
     host: process.env.DATABASE_HOST,
+    database: process.env.DATABASE_NAME,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     port: process.env.DATABASE_PORT ? Number(process.env.DATABASE_PORT) : undefined,
@@ -44,9 +45,9 @@ export default class Database {
         return Database.instance;
     }
 
-    private constructor(config: Omit<PoolConfig, "database">) {
+    private constructor(config: PoolConfig) {
         this.axobotPool = createPool({ ...config, database: "axobot" });
-        this.apiPool = createPool({ ...config, database: "axobot-api" });
+        this.apiPool = createPool(config);
         this.xpPool = createPool({ ...config, database: "zbot-xp" });
     }
 

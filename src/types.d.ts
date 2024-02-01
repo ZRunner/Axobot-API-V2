@@ -21,6 +21,7 @@ declare global {
             DISCORD_ENTITY_ID: "0" | "1" | "2";
             DATABASE_HOST: string;
             DATABASE_PORT?: string;
+            DATABASE_NAME: string;
             DATABASE_USER: string;
             DATABASE_PASSWORD: string;
             JWT_SECRET_TOKEN: string;
