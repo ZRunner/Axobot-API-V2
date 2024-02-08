@@ -24,20 +24,20 @@ export async function tokenCheckMiddleware(req: Request, res: Response, next: Ne
     // Existence du token
     if (!token) {
         res._err = "No authentication token found in request headers";
-        return res.status(401).json({ success: false, msg: res._err });
+        return res.status(401).send(res._err);
     }
 
     try {
         const info = await checkToken(token);
         if (info === null) {
             res._err = "Authentication token is invalid";
-            return res.status(401).json({ success: false, msg: res._err });
+            return res.status(401).send(res._err);
         }
         res.locals.user = info;
         next();
     } catch (err) {
         res._err = "Database error";
-        return res.status(500).json({ success: false, msg: res._err });
+        return res.status(500).send(res._err);
     }
 }
 
