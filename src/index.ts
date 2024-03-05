@@ -54,15 +54,15 @@ app.disable("x-powered-by");
 // @ts-ignore: Unreachable code error
 BigInt.prototype.toJSON = function() {
     return this.toString();
-  };
+};
 
 app.use(bodyParser.json());
 
 // set-up global rate limit
 const globalLimiter = rateLimit({
-	windowMs: 10 * 1000, // 10 seconds
-	max: 15, // Limit each IP to 15 requests per windowMs
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    windowMs: 10 * 1000, // 10 seconds
+    max: 15, // Limit each IP to 15 requests per windowMs
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 });
 app.use(globalLimiter);
 

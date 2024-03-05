@@ -42,25 +42,25 @@ export default class GuildConfigData {
             throw new Error(`Option ${optionName} does not exist`);
         }
         switch (option.type) {
-            case "boolean":
-                return value.toLowerCase() === "true";
-            case "int":
-            case "float":
-                return Number(value);
-            case "role":
-            case "text_channel":
-            case "voice_channel":
-            case "category":
-            case "color":
-            case "levelup_channel":
-                return Number(value);
-            case "roles_list":
-            case "text_channels_list":
-            case "emojis_list":
-                return JSON.parse(value);
-            default:
-                console.warn(`Untreated option type ${option.type}`);
-                return value;
+        case "boolean":
+            return value.toLowerCase() === "true";
+        case "int":
+        case "float":
+            return Number(value);
+        case "role":
+        case "text_channel":
+        case "voice_channel":
+        case "category":
+        case "color":
+        case "levelup_channel":
+            return Number(value);
+        case "roles_list":
+        case "text_channels_list":
+        case "emojis_list":
+            return JSON.parse(value);
+        default:
+            console.warn(`Untreated option type ${option.type}`);
+            return value;
         }
     }
 
