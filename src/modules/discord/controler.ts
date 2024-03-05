@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { is } from "typia";
 
 import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
@@ -109,4 +110,19 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
         "players_count": playersCount,
         "xp_type": xpType,
     });
+}
+
+export async function getBotChangelog(req: Request, res: Response) {
+    if (!is<"en" | "fr">(req.query.language)) {
+        res.status(400).send("Invalid language");
+        return;
+    }
+    const changelog = await db.getBotChangelog();
+    res.send(
+        changelog.map((entry) => ({
+            "version": entry.version,
+            "release_date": entry.release_date,
+            "content": entry[req.query.language as "en" | "fr"],
+        }))
+    );
 }
