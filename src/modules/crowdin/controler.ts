@@ -32,15 +32,15 @@ export async function postWebhookNotification(req: Request<{ webhook_id: string,
     // handle file events
     for (const event of fileEvents) {
         switch (event.event) {
-            case "file.added":
-                await handleFileAddedEvent(webhookPath, event);
-                break;
-            case "file.translated":
-                await handleFileTranslatedEvent(webhookPath, event);
-                break;
-            case "file.updated":
-                await handleFileUpdatedEvent(webhookPath, event);
-                break;
+        case "file.added":
+            await handleFileAddedEvent(webhookPath, event);
+            break;
+        case "file.translated":
+            await handleFileTranslatedEvent(webhookPath, event);
+            break;
+        case "file.updated":
+            await handleFileUpdatedEvent(webhookPath, event);
+            break;
         }
     }
     res.send("ok");
@@ -87,15 +87,15 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
     if (events.length === 1) {
         const event = events[0];
         switch (event.event) {
-            case "string.added":
-                await handleStringAdded(webhookPath, event);
-                break;
-            case "string.updated":
-                await handleStringUpdated(webhookPath, event);
-                break;
-            case "string.deleted":
-                await handleStringDeleted(webhookPath, event);
-                break;
+        case "string.added":
+            await handleStringAdded(webhookPath, event);
+            break;
+        case "string.updated":
+            await handleStringUpdated(webhookPath, event);
+            break;
+        case "string.deleted":
+            await handleStringDeleted(webhookPath, event);
+            break;
         }
         return;
     }
@@ -106,27 +106,27 @@ async function handleBatchStringsUpdate(webhookPath: string, events: CrowdinStri
         const file = event.string.file.path;
         const stringId = event.string.identifier;
         switch (event.event) {
-            case "string.added":
-                // if the string has been marked as deleted, mark it as updated
-                if (eventsMap.get("deleted-" + file).has(stringId)) {
-                    eventsMap.get("deleted-" + file).delete(stringId);
-                    eventsMap.get("updated-" + file).add(stringId);
-                } else {
-                    eventsMap.get("added-" + file).add(stringId);
-                }
-                break;
-            case "string.updated":
+        case "string.added":
+            // if the string has been marked as deleted, mark it as updated
+            if (eventsMap.get("deleted-" + file).has(stringId)) {
+                eventsMap.get("deleted-" + file).delete(stringId);
                 eventsMap.get("updated-" + file).add(stringId);
-                break;
-            case "string.deleted":
-                // if the string has been marked as added, mark it as updated
-                if (eventsMap.get("added-" + file).has(stringId)) {
-                    eventsMap.get("added-" + file).delete(stringId);
-                    eventsMap.get("updated-" + file).add(stringId);
-                } else {
-                    eventsMap.get("deleted-" + file).add(stringId);
-                }
-                break;
+            } else {
+                eventsMap.get("added-" + file).add(stringId);
+            }
+            break;
+        case "string.updated":
+            eventsMap.get("updated-" + file).add(stringId);
+            break;
+        case "string.deleted":
+            // if the string has been marked as added, mark it as updated
+            if (eventsMap.get("added-" + file).has(stringId)) {
+                eventsMap.get("added-" + file).delete(stringId);
+                eventsMap.get("updated-" + file).add(stringId);
+            } else {
+                eventsMap.get("deleted-" + file).add(stringId);
+            }
+            break;
         }
     }
     let text = "";
