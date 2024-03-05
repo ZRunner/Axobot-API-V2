@@ -96,6 +96,11 @@ export default class Database {
         return result;
     }
 
+    public async getBotChangelog(): Promise<{version: string, release_date: string, fr: string, en: string}[]> {
+        const result = await this.axobotPool.query("SELECT `version`, `release_date`, `fr`, `en` FROM `changelogs` WHERE `beta` = ? ORDER BY `release_date` DESC LIMIT 100", [BETA]);
+        return result;
+    }
+
 
     public async getTokenInformation(apiToken: string): Promise<TokenInformation | null> {
         const result = await this.apiPool.query<TokenInformation[]>("SELECT `user_id`, `api_token`, `discord_token`, `created_at`, `expires_at` FROM `tokens` WHERE `api_token` = ?", [apiToken]);
