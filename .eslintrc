@@ -27,6 +27,10 @@
                 "after": true
             }
         ],
+        "indent": [
+            "error",
+            4
+        ],
         "max-nested-callbacks": [
             "warn",
             {
