@@ -25,6 +25,7 @@ declare global {
             DATABASE_USER: string;
             DATABASE_PASSWORD: string;
             JWT_SECRET_TOKEN: string;
+            CORS_ACCEPTED_DOMAINS: string;
             JWT_TOKEN_EXPIRATION_DAYS?: string;
             PROXY_LEVEL?: string;
         }
