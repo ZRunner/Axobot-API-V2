@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import ConsoleStamp from "console-stamp";
 import dotenv from "dotenv";
 dotenv.config();
+import compression from "compression";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -44,6 +45,9 @@ app.use(cors({
 
 // Remove x-powered-by header
 app.disable("x-powered-by");
+
+// compress all responses
+app.use(compression());
 
 // Allow BigInt in JSON responses
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
