@@ -61,7 +61,7 @@ export default class DiscordClient {
             const index = (BigInt(userId) >> 22n) % 6n;
             return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
         }
-        return `https://cdn.discordapp.com/avatars/${userId}/${hash}.png`;
+        return `https://cdn.discordapp.com/avatars/${userId}/${hash}.webp`;
     }
 
     public async getRawUserData(userId: bigint | string): Promise<DBRawUserData | null> {
