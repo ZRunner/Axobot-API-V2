@@ -39,11 +39,7 @@ ConsoleStamp(console, {
 
 // Set up CORS
 app.use(cors({
-    origin: [
-        "https://axobeta.zrunner.me",
-        "https://axobot.xyz",
-        "http://localhost:3005",
-    ],
+    origin: process.env.CORS_ACCEPTED_DOMAINS.split(","),
 }));
 
 // Remove x-powered-by header
@@ -83,6 +79,7 @@ app.use("/discord", DiscordRouter);
 app.use("/docker", DockerRouter);
 
 // Middleware to return a clean error message when the body is not a valid JSON
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function(error: Error, req: Request, res: Response, next: NextFunction) {
     if (error instanceof SyntaxError) {
         res.status(400).send("Invalid JSON body");

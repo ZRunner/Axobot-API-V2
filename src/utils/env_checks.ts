@@ -9,6 +9,7 @@ const requiredEnvVariables = [
     "DATABASE_USER",
     "DATABASE_PASSWORD",
     "JWT_SECRET_TOKEN",
+    "CORS_ACCEPTED_DOMAINS",
 ];
 
 /**
