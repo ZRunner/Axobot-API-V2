@@ -3,6 +3,7 @@ import { is } from "typia";
 
 import DiscordClient from "../../bot/client";
 import Database from "../../database/db";
+import { GuildConfigOptionCategory, GuildConfigOptionCategoryNames } from "../../database/guild-config/guild-config";
 import { tokenCheckMiddleware } from "../auth/tokens";
 import { isDiscordServerMember } from "./middlewares";
 import { getGuildInfo, transformLeaderboard } from "./utils/leaderboard";
@@ -11,12 +12,16 @@ import { getGuildInfo, transformLeaderboard } from "./utils/leaderboard";
 const db = Database.getInstance();
 const discordClient = DiscordClient.getInstance();
 
-export async function getDefaultGuildConfig(req: Request, res: Response) {
+export async function getDefaultGuildConfigOptions(req: Request, res: Response) {
     const optionsList = await discordClient.getDefaultGuildConfig();
     res.send(optionsList);
 }
 
 export async function getGuildConfig(req: Request, res: Response) {
+    if (!is<GuildConfigOptionCategory[] | GuildConfigOptionCategory | "all">(req.query.category)) {
+        res.status(400).send("Invalid category");
+        return;
+    }
     let guildId;
     try {
         guildId = BigInt(req.params.guildId);
@@ -24,7 +29,14 @@ export async function getGuildConfig(req: Request, res: Response) {
         res.status(400).send("Invalid guild ID");
         return;
     }
-    const config = await discordClient.getGuildConfig(guildId);
+    const categories = (
+        req.query.category === "all"
+            ? GuildConfigOptionCategoryNames
+            : Array.isArray(req.query.category)
+                ? req.query.category
+                : [req.query.category]
+    );
+    const config = await discordClient.getGuildCategoriesConfigOptions(guildId, categories);
     res.send(config);
 }
 
@@ -68,12 +80,12 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
         res.status(404).send(res._err);
         return;
     }
-    const isXpEnabled = await discordClient.getGuildConfigValue(guildId, "enable_xp");
+    const isXpEnabled = await discordClient.getGuildConfigOptionValue(guildId, "enable_xp");
     if (!isXpEnabled) {
         res.status(400).send("XP is not enabled for this guild");
         return;
     }
-    const isPrivateLeaderboard = await discordClient.getGuildConfigValue(guildId, "private_leaderboard");
+    const isPrivateLeaderboard = await discordClient.getGuildConfigOptionValue(guildId, "private_leaderboard");
     if (isPrivateLeaderboard) {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         const err = await tokenCheckMiddleware(req, res, () => {}) || await isDiscordServerMember(req, res, () => {});
@@ -81,7 +93,7 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
             return err;
         }
     }
-    const xpType = await discordClient.getGuildConfigValue(guildId, "xp_type") as string;
+    const xpType = await discordClient.getGuildConfigOptionValue(guildId, "xp_type") as string;
     let players, playersCount;
     try {
         if (xpType === "global") {

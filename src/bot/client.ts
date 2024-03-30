@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import Database from "../database/db";
-import GuildConfigManager, { GuildConfigOptionValueType } from "../database/guild-config/guild-config";
+import GuildConfigManager, { GuildConfigOptionCategory, PartialGuildConfig } from "../database/guild-config/guild-config";
 import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
@@ -149,28 +149,29 @@ export default class DiscordClient {
     }
 
     public async getDefaultGuildConfig() {
-        return await this.guildConfigManager.getOptionsList();
+        return GuildConfigManager.optionsList;
     }
 
-    public async getGuildConfig(guildId: bigint) {
-        const setupOptions = await this.db.getGuildConfig(guildId);
-        const defaultConfig = await this.guildConfigManager.getOptionsList();
-        const config: Record<string, GuildConfigOptionValueType> = {};
-        for (const optionsList of Object.values(defaultConfig)) {
-            for (const [optionName, value] of Object.entries(optionsList)) {
+    public async getGuildCategoriesConfigOptions(guildId: bigint, categories: readonly GuildConfigOptionCategory[]): Promise<PartialGuildConfig> {
+        const setupOptions = await this.db.getFullGuildConfigOptions(guildId);
+        const defaultConfig = GuildConfigManager.optionsList;
+        const config: PartialGuildConfig = {};
+        for (const categoryName of categories) {
+            config[categoryName] = {};
+            for (const [optionName, value] of Object.entries(defaultConfig[categoryName])) {
                 const option = setupOptions.find((item) => item.option_name === optionName);
                 if (option === undefined) {
-                    config[optionName] = value.default;
+                    config[categoryName]![optionName] = value.default;
                 } else {
-                    config[optionName] = await this.guildConfigManager.convertToType(option.option_name, option.value);
+                    config[categoryName]![optionName] = await this.guildConfigManager.convertToType(option.option_name, option.value);
                 }
             }
         }
         return config;
     }
 
-    public async getGuildConfigValue(guildId: bigint, optionName: string) {
-        const dbValue = await this.db.getGuildConfigValue(guildId, optionName);
+    public async getGuildConfigOptionValue(guildId: bigint, optionName: string) {
+        const dbValue = await this.db.getGuildConfigOptionValue(guildId, optionName);
         if (dbValue !== null) {
             return await this.guildConfigManager.convertToType(optionName, dbValue);
         }
