@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import Database from "../database/db";
-import GuildConfigData from "../database/guild-config/guild-config";
+import GuildConfigManager from "../database/guild-config/guild-config";
 import { AllRepresentation } from "../database/guild-config/guild-config-types";
 import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
@@ -15,7 +15,7 @@ export default class DiscordClient {
 
     private db: Database = Database.getInstance();
 
-    private defaultGuildConfig: GuildConfigData = GuildConfigData.getInstance();
+    private guildConfigManager: GuildConfigManager = GuildConfigManager.getInstance();
 
     private fetchedGuildIds = new Set<bigint>();
 
@@ -151,12 +151,12 @@ export default class DiscordClient {
     }
 
     public async getDefaultGuildConfig() {
-        return await this.defaultGuildConfig.getOptionsList();
+        return await this.guildConfigManager.getOptionsList();
     }
 
     public async getGuildConfig(guildId: bigint) {
         const setupOptions = await this.db.getGuildConfig(guildId);
-        const defaultConfig = await this.defaultGuildConfig.getOptionsList();
+        const defaultConfig = await this.guildConfigManager.getOptionsList();
         const config: Record<string, ConfigValueType> = {};
         for (const optionsList of Object.values(defaultConfig)) {
             for (const [optionName, value] of Object.entries(optionsList)) {
@@ -164,7 +164,7 @@ export default class DiscordClient {
                 if (option === undefined) {
                     config[optionName] = value.default;
                 } else {
-                    config[optionName] = await this.defaultGuildConfig.convertToType(option.option_name, option.value);
+                    config[optionName] = await this.guildConfigManager.convertToType(option.option_name, option.value);
                 }
             }
         }
@@ -174,10 +174,14 @@ export default class DiscordClient {
     public async getGuildConfigValue(guildId: bigint, optionName: string) {
         const dbValue = await this.db.getGuildConfigValue(guildId, optionName);
         if (dbValue !== null) {
-            return await this.defaultGuildConfig.convertToType(optionName, dbValue);
+            return await this.guildConfigManager.convertToType(optionName, dbValue);
         }
-        const defaultConfig = await this.defaultGuildConfig.getOptionsList();
-        return defaultConfig[optionName].default;
+        // if unset, return default value
+        const option = await this.guildConfigManager.getOptionFromName(optionName);
+        if (option === undefined) {
+            throw new Error(`Option ${optionName} does not exist`);
+        }
+        return option.default;
     }
 
 }
