@@ -51,12 +51,12 @@ export default class Database {
         this.xpPool = createPool({ ...config, database: "zbot-xp" });
     }
 
-    public async getGuildConfig(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
+    public async getFullGuildConfigOptions(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
         const result = await this.axobotPool.query<{ option_name: string, value: string }[]>("SELECT `option_name`, `value` FROM `serverconfig` WHERE `guild_id` = ? AND `beta` = ?", [guildId, BETA]);
         return result;
     }
 
-    public async getGuildConfigValue(guildId: bigint, optionName: string): Promise<string | null> {
+    public async getGuildConfigOptionValue(guildId: bigint, optionName: string): Promise<string | null> {
         const result = await this.axobotPool.query<{ value: string }[]>("SELECT  `value` FROM `serverconfig` WHERE `guild_id` = ? AND `option_name` = ? AND `beta` = ?", [guildId, optionName, BETA]);
         return result[0]?.value ?? null;
     }

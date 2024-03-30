@@ -1,9 +1,11 @@
 import GuildConfigOptionsMap from "./guild-config-options.json";
 import { AllRepresentation } from "./guild-config-types";
 
-export type GuildConfigOptionCategory = "core" | "info" | "moderation" | "partners" | "poll-channels" | "streamers" | "voice-channels" | "welcome" | "xp";
+export const GuildConfigOptionCategoryNames = ["core", "info", "moderation", "partners", "poll-channels", "streamers", "voice-channels", "welcome", "xp"] as const;
+export type GuildConfigOptionCategory = typeof GuildConfigOptionCategoryNames[number];
 export type GuildConfigOptionsMapType = Record<GuildConfigOptionCategory, Record<string, AllRepresentation>>;
 export type GuildConfigOptionValueType = AllRepresentation["default"];
+export type PartialGuildConfig = Partial<Record<GuildConfigOptionCategory, Record<string, unknown>>>;
 
 export default class GuildConfigManager {
     private static instance: GuildConfigManager;
@@ -17,13 +19,10 @@ export default class GuildConfigManager {
         return GuildConfigManager.instance;
     }
 
-    public async getOptionsList() {
-        return GuildConfigOptionsMap as GuildConfigOptionsMapType;
-    }
+    public static optionsList = GuildConfigOptionsMap as GuildConfigOptionsMapType;
 
     public async getOptionCategoryFromName(optionName: string): Promise<GuildConfigOptionCategory | undefined> {
-        const optionsList = await this.getOptionsList();
-        for (const [category, options] of Object.entries(optionsList)) {
+        for (const [category, options] of Object.entries(GuildConfigManager.optionsList)) {
             if (options[optionName]) {
                 return category as GuildConfigOptionCategory;
             }
@@ -31,12 +30,11 @@ export default class GuildConfigManager {
     }
 
     public async getOptionFromName(optionName: string): Promise<AllRepresentation | undefined> {
-        const optionsList = await this.getOptionsList();
         const optionCategory = await this.getOptionCategoryFromName(optionName);
         if (!optionCategory) {
             return;
         }
-        return optionsList[optionCategory][optionName];
+        return GuildConfigManager.optionsList[optionCategory][optionName];
     }
 
     public async convertToType(optionName: string, value: string): Promise<AllRepresentation["default"]> {
