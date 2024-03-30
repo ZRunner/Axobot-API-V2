@@ -1,8 +1,9 @@
 import GuildConfigOptionsMap from "./guild-config-options.json";
 import { AllRepresentation } from "./guild-config-types";
 
-type GuildConfigOptionCategory = "core" | "info" | "moderation" | "partners" | "poll-channels" | "streamers" | "voice-channels" | "welcome" | "xp";
-type GuildConfigOptionsMapType = Record<GuildConfigOptionCategory, Record<string, AllRepresentation>>;
+export type GuildConfigOptionCategory = "core" | "info" | "moderation" | "partners" | "poll-channels" | "streamers" | "voice-channels" | "welcome" | "xp";
+export type GuildConfigOptionsMapType = Record<GuildConfigOptionCategory, Record<string, AllRepresentation>>;
+export type GuildConfigOptionValueType = AllRepresentation["default"];
 
 export default class GuildConfigManager {
     private static instance: GuildConfigManager;
