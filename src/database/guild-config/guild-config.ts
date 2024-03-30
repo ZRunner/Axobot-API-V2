@@ -1,11 +1,10 @@
+import GuildConfigOptionsList from "./guild-config.json";
 import { AllRepresentation } from "./guild-config-types";
 
 type DefaultConfigurationMapType = Record<string, AllRepresentation>;
 
 export default class GuildConfigData {
     private static instance: GuildConfigData;
-
-    private optionsList: DefaultConfigurationMapType | null = null;
 
     private constructor() {}
 
@@ -16,23 +15,8 @@ export default class GuildConfigData {
         return GuildConfigData.instance;
     }
 
-    private async fetchOptionsList(): Promise<DefaultConfigurationMapType> {
-        const url = "https://raw.githubusercontent.com/ZRunner/Axobot/develop/libs/serverconfig/options_list.json";
-        try {
-            const response = await fetch(url);
-            const content = await response.text();
-            return JSON.parse(content);
-        } catch (error) {
-            console.error("Error fetching options list:", error);
-            throw error;
-        }
-    }
-
-    public async getOptionsList(): Promise<DefaultConfigurationMapType> {
-        if (!this.optionsList) {
-            this.optionsList = await this.fetchOptionsList();
-        }
-        return this.optionsList;
+    public async getOptionsList() {
+        return GuildConfigOptionsList as DefaultConfigurationMapType;
     }
 
     public async convertToType(optionName: string, value: string): Promise<AllRepresentation["default"]> {
@@ -63,6 +47,5 @@ export default class GuildConfigData {
             return value;
         }
     }
-
 
 }
