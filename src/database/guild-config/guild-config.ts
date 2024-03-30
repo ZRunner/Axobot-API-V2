@@ -1,31 +1,41 @@
-import GuildConfigOptionsList from "./guild-config-map.json";
+import GuildConfigOptionsMap from "./guild-config-options.json";
 import { AllRepresentation } from "./guild-config-types";
 
-type DefaultConfigurationMapType = Record<string, Record<string, AllRepresentation>>;
+type GuildConfigOptionCategory = "core" | "info" | "moderation" | "partners" | "poll-channels" | "streamers" | "voice-channels" | "welcome" | "xp";
+type GuildConfigOptionsMapType = Record<GuildConfigOptionCategory, Record<string, AllRepresentation>>;
 
-export default class GuildConfigData {
-    private static instance: GuildConfigData;
+export default class GuildConfigManager {
+    private static instance: GuildConfigManager;
 
     private constructor() {}
 
-    public static getInstance(): GuildConfigData {
-        if (!GuildConfigData.instance) {
-            GuildConfigData.instance = new GuildConfigData();
+    public static getInstance(): GuildConfigManager {
+        if (!GuildConfigManager.instance) {
+            GuildConfigManager.instance = new GuildConfigManager();
         }
-        return GuildConfigData.instance;
+        return GuildConfigManager.instance;
     }
 
     public async getOptionsList() {
-        return GuildConfigOptionsList as DefaultConfigurationMapType;
+        return GuildConfigOptionsMap as GuildConfigOptionsMapType;
+    }
+
+    public async getOptionCategoryFromName(optionName: string): Promise<GuildConfigOptionCategory | undefined> {
+        const optionsList = await this.getOptionsList();
+        for (const [category, options] of Object.entries(optionsList)) {
+            if (options[optionName]) {
+                return category as GuildConfigOptionCategory;
+            }
+        }
     }
 
     public async getOptionFromName(optionName: string): Promise<AllRepresentation | undefined> {
         const optionsList = await this.getOptionsList();
-        for (const option of Object.values(optionsList)) {
-            if (option[optionName]) {
-                return option[optionName];
-            }
+        const optionCategory = await this.getOptionCategoryFromName(optionName);
+        if (!optionCategory) {
+            return;
         }
+        return optionsList[optionCategory][optionName];
     }
 
     public async convertToType(optionName: string, value: string): Promise<AllRepresentation["default"]> {
