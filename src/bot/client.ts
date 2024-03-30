@@ -1,12 +1,10 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import Database from "../database/db";
-import GuildConfigManager from "../database/guild-config/guild-config";
-import { AllRepresentation } from "../database/guild-config/guild-config-types";
+import GuildConfigManager, { GuildConfigOptionValueType } from "../database/guild-config/guild-config";
 import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
-type ConfigValueType = AllRepresentation["default"];
 
 export default class DiscordClient {
     private static instance: DiscordClient;
@@ -157,7 +155,7 @@ export default class DiscordClient {
     public async getGuildConfig(guildId: bigint) {
         const setupOptions = await this.db.getGuildConfig(guildId);
         const defaultConfig = await this.guildConfigManager.getOptionsList();
-        const config: Record<string, ConfigValueType> = {};
+        const config: Record<string, GuildConfigOptionValueType> = {};
         for (const optionsList of Object.values(defaultConfig)) {
             for (const [optionName, value] of Object.entries(optionsList)) {
                 const option = setupOptions.find((item) => item.option_name === optionName);
