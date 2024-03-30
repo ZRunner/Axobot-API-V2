@@ -158,12 +158,14 @@ export default class DiscordClient {
         const setupOptions = await this.db.getGuildConfig(guildId);
         const defaultConfig = await this.defaultGuildConfig.getOptionsList();
         const config: Record<string, ConfigValueType> = {};
-        for (const [optionName, value] of Object.entries(defaultConfig)) {
-            const option = setupOptions.find((item) => item.option_name === optionName);
-            if (option === undefined) {
-                config[optionName] = value.default;
-            } else {
-                config[optionName] = await this.defaultGuildConfig.convertToType(option.option_name, option.value);
+        for (const optionsList of Object.values(defaultConfig)) {
+            for (const [optionName, value] of Object.entries(optionsList)) {
+                const option = setupOptions.find((item) => item.option_name === optionName);
+                if (option === undefined) {
+                    config[optionName] = value.default;
+                } else {
+                    config[optionName] = await this.defaultGuildConfig.convertToType(option.option_name, option.value);
+                }
             }
         }
         return config;

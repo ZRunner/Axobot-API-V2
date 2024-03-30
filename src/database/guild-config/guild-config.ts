@@ -1,7 +1,7 @@
 import GuildConfigOptionsList from "./guild-config.json";
 import { AllRepresentation } from "./guild-config-types";
 
-type DefaultConfigurationMapType = Record<string, AllRepresentation>;
+type DefaultConfigurationMapType = Record<string, Record<string, AllRepresentation>>;
 
 export default class GuildConfigData {
     private static instance: GuildConfigData;
@@ -19,9 +19,17 @@ export default class GuildConfigData {
         return GuildConfigOptionsList as DefaultConfigurationMapType;
     }
 
-    public async convertToType(optionName: string, value: string): Promise<AllRepresentation["default"]> {
+    public async getOptionFromName(optionName: string): Promise<AllRepresentation | undefined> {
         const optionsList = await this.getOptionsList();
-        const option = optionsList[optionName];
+        for (const option of Object.values(optionsList)) {
+            if (option[optionName]) {
+                return option[optionName];
+            }
+        }
+    }
+
+    public async convertToType(optionName: string, value: string): Promise<AllRepresentation["default"]> {
+        const option = await this.getOptionFromName(optionName);
         if (!option) {
             throw new Error(`Option ${optionName} does not exist`);
         }
@@ -42,7 +50,11 @@ export default class GuildConfigData {
         case "text_channels_list":
         case "emojis_list":
             return JSON.parse(value);
+        case "enum":
+        case "text":
+            return value;
         default:
+            // @ts-expect-error option type is not handled
             console.warn(`Untreated option type ${option.type}`);
             return value;
         }
