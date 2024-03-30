@@ -1,4 +1,4 @@
-import GuildConfigOptionsList from "./guild-config.json";
+import GuildConfigOptionsList from "./guild-config-map.json";
 import { AllRepresentation } from "./guild-config-types";
 
 type DefaultConfigurationMapType = Record<string, Record<string, AllRepresentation>>;
