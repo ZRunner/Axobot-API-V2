@@ -2,6 +2,7 @@ import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
 import { TokenInformation } from "./models/auth";
 import { DBRawUserData } from "./models/users";
+import { LeaderboardPlayer, RoleReward } from "./models/xp";
 
 const BETA = process.env.DISCORD_ENTITY_ID === "1";
 
@@ -52,8 +53,7 @@ export default class Database {
     }
 
     public async getFullGuildConfigOptions(guildId: bigint): Promise<{ option_name: string, value: string }[]> {
-        const result = await this.axobotPool.query<{ option_name: string, value: string }[]>("SELECT `option_name`, `value` FROM `serverconfig` WHERE `guild_id` = ? AND `beta` = ?", [guildId, BETA]);
-        return result;
+        return await this.axobotPool.query<{ option_name: string, value: string }[]>("SELECT `option_name`, `value` FROM `serverconfig` WHERE `guild_id` = ? AND `beta` = ?", [guildId, BETA]);
     }
 
     public async getGuildConfigOptionValue(guildId: bigint, optionName: string): Promise<string | null> {
@@ -61,9 +61,8 @@ export default class Database {
         return result[0]?.value ?? null;
     }
 
-    public async getGlobalLeaderboard(page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
-        const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
-        return result;
+    public async getGlobalLeaderboard(page = 0, limit = 50): Promise<LeaderboardPlayer[]> {
+        return await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
     }
 
     public async getGlobalLeaderboardCount(): Promise<number> {
@@ -71,9 +70,8 @@ export default class Database {
         return result[0].count;
     }
 
-    public async getFilteredGlobalLeaderboard(userIds: bigint[], page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
-        const result = await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 AND `userID` IN (?) ORDER BY `xp` DESC LIMIT ?, ?", [userIds, page * limit, limit]);
-        return result;
+    public async getFilteredGlobalLeaderboard(userIds: bigint[], page = 0, limit = 50): Promise<LeaderboardPlayer[]> {
+        return await this.axobotPool.query("SELECT `userID`, `xp` FROM `xp` WHERE banned = 0 AND `userID` IN (?) ORDER BY `xp` DESC LIMIT ?, ?", [userIds, page * limit, limit]);
     }
 
     public async getFilteredGlobalLeaderboardCount(userIds: bigint[]): Promise<number> {
@@ -81,9 +79,8 @@ export default class Database {
         return result[0].count;
     }
 
-    public async getGuildLeaderboard(guildId: bigint, page = 0, limit = 50): Promise<{userID: bigint, xp: bigint}[]> {
-        const result = await this.xpPool.query("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
-        return result;
+    public async getGuildLeaderboard(guildId: bigint, page = 0, limit = 50): Promise<LeaderboardPlayer[]> {
+        return await this.xpPool.query("SELECT `userID`, `xp` FROM `" + guildId + "` WHERE banned = 0 ORDER BY `xp` DESC LIMIT ?, ?", [page * limit, limit]);
     }
 
     public async getGuildLeaderboardCount(guildId: bigint): Promise<number> {
@@ -92,13 +89,15 @@ export default class Database {
     }
 
     public async getUserDataFromCache(userIds: bigint[]): Promise<DBRawUserData[]> {
-        const result = await this.axobotPool.query("SELECT `user_id`, `username`, `global_name`, `avatar_hash`, `is_bot` from `users_cache` WHERE `user_id` IN (?)", [userIds]);
-        return result;
+        return await this.axobotPool.query("SELECT `user_id`, `username`, `global_name`, `avatar_hash`, `is_bot` from `users_cache` WHERE `user_id` IN (?)", [userIds]);
     }
 
     public async getBotChangelog(): Promise<{version: string, release_date: string, fr: string, en: string}[]> {
-        const result = await this.axobotPool.query("SELECT `version`, `release_date`, `fr`, `en` FROM `changelogs` WHERE `beta` = ? ORDER BY `release_date` DESC LIMIT 100", [BETA]);
-        return result;
+        return await this.axobotPool.query("SELECT `version`, `release_date`, `fr`, `en` FROM `changelogs` WHERE `beta` = ? ORDER BY `release_date` DESC LIMIT 100", [BETA]);
+    }
+
+    public async getGuildRoleRewards(guildId: bigint): Promise<RoleReward[]> {
+        return await this.axobotPool.query("SELECT `ID`, `guild`, `role`, `level`, `added_at` FROM `roles_rewards` WHERE `guild` = ?", [guildId]);
     }
 
 
