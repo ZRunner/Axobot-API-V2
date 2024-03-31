@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import Database from "../database/db";
-import GuildConfigManager, { GuildConfigOptionCategory, PartialGuildConfig } from "../database/guild-config/guild-config";
+import GuildConfigManager, { GuildConfigOptionCategory, PartialGuildConfig } from "../database/guild-config/guild-config-manager";
 import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
