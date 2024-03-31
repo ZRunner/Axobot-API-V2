@@ -1,8 +1,8 @@
 export interface RoleReward {
-    ID: number;
-    guild: number;
-    role: number;
-    level: number;
+    ID: bigint;
+    guild: bigint;
+    role: bigint;
+    level: bigint;
     added_at: Date;
 }
 

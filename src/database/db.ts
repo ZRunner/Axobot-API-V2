@@ -97,7 +97,16 @@ export default class Database {
     }
 
     public async getGuildRoleRewards(guildId: bigint): Promise<RoleReward[]> {
-        return await this.axobotPool.query("SELECT `ID`, `guild`, `role`, `level`, `added_at` FROM `roles_rewards` WHERE `guild` = ?", [guildId]);
+        type RawData = {[Property in keyof RoleReward]: RoleReward[Property] extends bigint ? string : RoleReward[Property]};
+        const result = await this.axobotPool.query<RawData[]>("SELECT `ID`, `guild`, `role`, `level`, `added_at` FROM `roles_rewards` WHERE `guild` = ?", [guildId]);
+        // convert strings to bigints
+        return result.map((row) => ({
+            ...row,
+            "ID": BigInt(row.ID),
+            "guild": BigInt(row.guild),
+            "role": BigInt(row.role),
+            "level": BigInt(row.level),
+        }));
     }
 
 
