@@ -61,6 +61,7 @@ export async function getGlobalLeaderboard(req: Request, res: Response, next: Ne
         "players": players,
         "players_count": playersCount,
         "xp_type": "global",
+        "xp_rate": 1.0,
     });
 }
 
@@ -116,11 +117,13 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
         return;
     }
     const guildData = await getGuildInfo(guild);
+    const xpRate = xpType === "global" ? 1.0 : await discordClient.getGuildConfigOptionValue(guildId, "xp_rate") as number;
     res.send({
         "guild": guildData,
         "players": players,
         "players_count": playersCount,
         "xp_type": xpType,
+        "xp_rate": xpRate,
     });
 }
 
