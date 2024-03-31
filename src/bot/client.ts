@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
 
 import Database from "../database/db";
-import GuildConfigManager, { GuildConfigOptionCategory, PartialGuildConfig } from "../database/guild-config/guild-config-manager";
+import GuildConfigManager from "../database/guild-config/guild-config-manager";
 import { DBRawUserData } from "../database/models/users";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
@@ -12,8 +12,6 @@ export default class DiscordClient {
     private client: Client | null = null;
 
     private db: Database = Database.getInstance();
-
-    private guildConfigManager: GuildConfigManager = GuildConfigManager.getInstance();
 
     private fetchedGuildIds = new Set<bigint>();
 
@@ -152,51 +150,5 @@ export default class DiscordClient {
         return GuildConfigManager.optionsList;
     }
 
-    public async getGuildConfigOptionValue(guildId: bigint, optionName: string) {
-        const dbValue = await this.db.getGuildConfigOptionValue(guildId, optionName);
-        if (dbValue !== null) {
-            return await this.guildConfigManager.convertToType(optionName, dbValue);
-        }
-        // if unset, return default value
-        const option = await this.guildConfigManager.getOptionFromName(optionName);
-        if (option === undefined) {
-            throw new Error(`Option ${optionName} does not exist`);
-        }
-        return option.default;
-    }
-
-    public async getGuildCategoriesConfigOptions(guildId: bigint, categories: readonly GuildConfigOptionCategory[]): Promise<PartialGuildConfig> {
-        const setupOptions = await this.db.getFullGuildConfigOptions(guildId);
-        const defaultConfig = GuildConfigManager.optionsList;
-        const config: PartialGuildConfig = {};
-        for (const categoryName of categories) {
-            config[categoryName] = await this.getGuildConfigForCategory(guildId, categoryName);
-            for (const [optionName, value] of Object.entries(defaultConfig[categoryName])) {
-                const option = setupOptions.find((item) => item.option_name === optionName);
-                if (option === undefined) {
-                    config[categoryName]![optionName] = value.default;
-                } else {
-                    config[categoryName]![optionName] = await this.guildConfigManager.convertToType(option.option_name, option.value);
-                }
-            }
-        }
-        return config;
-    }
-
-    private async getGuildConfigForCategory(guildId: bigint, category: GuildConfigOptionCategory) {
-        switch (category) {
-        case "xp":
-            return await this.getGuildXpConfig(guildId);
-        default:
-            return {};
-        }
-    }
-
-    public async getGuildXpConfig(guildId: bigint) {
-        const roleRewards = await this.db.getGuildRoleRewards(guildId);
-        return {
-            "role_rewards": roleRewards,
-        };
-    }
 
 }
