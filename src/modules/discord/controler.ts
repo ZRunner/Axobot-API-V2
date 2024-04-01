@@ -142,3 +142,18 @@ export async function getBotChangelog(req: Request, res: Response) {
         }))
     );
 }
+
+export async function getUserGuilds(req: Request, res: Response) {
+    if (!res.locals.user?.discord_token) {
+        return res.status(401).send("Invalid token");
+    }
+    const userGuilds = await discordClient.getGuildsFromOauth(res.locals.user.discord_token);
+
+    if (userGuilds === null) {
+        res._err = "Unable to get user guilds";
+        res.status(500).send(res._err);
+        return;
+    }
+
+    res.send(userGuilds);
+}
