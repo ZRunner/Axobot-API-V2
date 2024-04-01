@@ -41,6 +41,16 @@ export default class DiscordClient {
         this.client?.destroy();
     }
 
+    private async waitUntilReady() {
+        return new Promise<void>(resolve => {
+            if (this.client?.isReady()) {
+                resolve();
+            } else {
+                this.client?.once(Events.ClientReady, () => resolve());
+            }
+        });
+    }
+
     public async resolveUser(userId: string) {
         const client = await this.getClient();
         try {
@@ -154,7 +164,6 @@ export default class DiscordClient {
     public async getUserFromOauth(discordToken: string): Promise<OauthUserData | null> {
         const user: OauthUserData | DiscordAPIError = await fetch("https://discord.com/api/users/@me", {
             headers: {
-                // "Authorization": `${token.token_type} ${token.access_token}`,
                 "Authorization": `Bearer ${discordToken}`,
             },
         }).then(fres => fres.json());
@@ -178,12 +187,18 @@ export default class DiscordClient {
             return null;
         }
 
+        const client = await this.getClient();
+        await this.waitUntilReady();
+
         return data.map(guild => {
             const permissions = new PermissionsBitField(BigInt(guild.permissions));
+            const cachedGuild = client.guilds.cache.get(guild.id);
             return {
                 id: guild.id,
                 name: guild.name,
                 icon: guild.icon,
+                banner: cachedGuild?.banner || null,
+                splash: cachedGuild?.splash || null,
                 owner: guild.owner,
                 isAdmin: guild.owner || permissions.has("Administrator"),
                 permissions: permissions,
