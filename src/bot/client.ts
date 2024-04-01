@@ -190,21 +190,22 @@ export default class DiscordClient {
         const client = await this.getClient();
         await this.waitUntilReady();
 
-        return data.map(guild => {
-            const permissions = new PermissionsBitField(BigInt(guild.permissions));
-            const cachedGuild = client.guilds.cache.get(guild.id);
+        return await Promise.all(data.map(async (rawGuild) => {
+            const permissions = new PermissionsBitField(BigInt(rawGuild.permissions));
+            const fetchedGuild = await client.guilds.fetch(rawGuild.id).catch(() => null);
             return {
-                id: guild.id,
-                name: guild.name,
-                icon: guild.icon,
-                banner: cachedGuild?.banner || null,
-                splash: cachedGuild?.splash || null,
-                owner: guild.owner,
-                isAdmin: guild.owner || permissions.has("Administrator"),
+                id: rawGuild.id,
+                name: rawGuild.name,
+                icon: rawGuild.icon,
+                banner: fetchedGuild?.banner || null,
+                splash: fetchedGuild?.splash || null,
+                owner: rawGuild.owner,
+                isAdmin: rawGuild.owner || permissions.has("Administrator"),
+                isBotPresent: fetchedGuild !== null,
                 permissions: permissions,
-                features: guild.features,
+                features: rawGuild.features,
             };
-        });
+        }));
     }
 
 }
