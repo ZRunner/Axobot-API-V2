@@ -17,3 +17,9 @@ export const getLeaderboardRateLimiter = rateLimit({
     max: 6,
     standardHeaders: true,
 });
+
+export const getGuildsListRateLimiter = rateLimit({
+    windowMs: 15 * 1000,
+    max: 3,
+    standardHeaders: true,
+});

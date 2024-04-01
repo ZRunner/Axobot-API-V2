@@ -1,6 +1,7 @@
 import { Guild } from "discord.js";
 
 import DiscordClient from "../../../bot/client";
+import { LeaderboardGuildData } from "../types/guilds";
 import { getLevelFromGeneralXp, getLevelFromMEE6Xp, getXpFromGeneralLevel, getXpFromMEE6Level } from "./xp";
 
 const discordClient = DiscordClient.getInstance();

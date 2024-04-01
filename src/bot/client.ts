@@ -166,4 +166,30 @@ export default class DiscordClient {
         return user;
     }
 
+    public async getGuildsFromOauth(discordToken: string): Promise<OauthGuildData[] | null> {
+        const data: OauthGuildRawData[] = await fetch("https://discord.com/api/v10/users/@me/guilds", {
+            headers: {
+                "Authorization": `Bearer ${discordToken}`,
+            },
+        }).then(fres => fres.json());
+
+        if (isDiscordAPIError(data)) {
+            console.debug(data);
+            return null;
+        }
+
+        return data.map(guild => {
+            const permissions = new PermissionsBitField(BigInt(guild.permissions));
+            return {
+                id: guild.id,
+                name: guild.name,
+                icon: guild.icon,
+                owner: guild.owner,
+                isAdmin: guild.owner || permissions.has("Administrator"),
+                permissions: permissions,
+                features: guild.features,
+            };
+        });
+    }
+
 }
