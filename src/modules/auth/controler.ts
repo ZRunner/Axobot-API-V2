@@ -3,22 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import DiscordClient from "../../bot/client";
 import { createToken } from "./tokens";
 
-interface GetMeSuccessResponse {
-    id: string;
-    avatar: string | null;
-    global_name: string | null;
-    locale: string;
-    public_flags: number;
-    username: string;
-}
-interface GetmeErrorResponse {
-    message: string;
-    code: number;
-}
-
-function isGetMeErrorResponse(obj: unknown): obj is GetmeErrorResponse {
-    return typeof obj === "object" && obj !== null && (obj as GetmeErrorResponse).message !== undefined;
-}
 
 const discordClient = DiscordClient.getInstance();
 
@@ -53,14 +37,9 @@ export async function getDiscordCallback(req: Request, res: Response, next: Next
         return;
     }
 
-    const user: GetMeSuccessResponse | GetmeErrorResponse = await fetch("https://discord.com/api/users/@me", {
-        headers: {
-            "Authorization": `${token.token_type} ${token.access_token}`,
-        },
-    }).then(fres => fres.json());
+    const user = await discordClient.getUserFromOauth(token.access_token);
 
-    if (isGetMeErrorResponse(user)) {
-        console.debug(user);
+    if (user === null) {
         res._err = "Invalid token";
         res.status(500).send(res._err);
         return;

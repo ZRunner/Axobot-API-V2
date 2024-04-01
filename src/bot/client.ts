@@ -1,8 +1,9 @@
-import { Client, Events, GatewayIntentBits, PermissionResolvable } from "discord.js";
+import { Client, DiscordAPIError, Events, GatewayIntentBits, PermissionResolvable, PermissionsBitField } from "discord.js";
 
 import Database from "../database/db";
 import GuildConfigManager from "../database/guild-config/guild-config-manager";
 import { DBRawUserData } from "../database/models/users";
+import { OauthGuildData, OauthGuildRawData } from "../modules/discord/types/guilds";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
 
@@ -150,5 +151,19 @@ export default class DiscordClient {
         return GuildConfigManager.optionsList;
     }
 
+    public async getUserFromOauth(discordToken: string): Promise<OauthUserData | null> {
+        const user: OauthUserData | DiscordAPIError = await fetch("https://discord.com/api/users/@me", {
+            headers: {
+                // "Authorization": `${token.token_type} ${token.access_token}`,
+                "Authorization": `Bearer ${discordToken}`,
+            },
+        }).then(fres => fres.json());
+
+        if (isDiscordAPIError(user)) {
+            console.debug(user);
+            return null;
+        }
+        return user;
+    }
 
 }
