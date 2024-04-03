@@ -23,6 +23,7 @@ interface OauthGuildData {
     splash: string | null;
     owner: boolean;
     isAdmin: boolean;
+    isBotPresent: boolean;
     permissions: PermissionsBitField;
     features: GuildFeature[];
 }
