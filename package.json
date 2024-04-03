@@ -37,6 +37,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "cache-manager": "^5.4.0",
     "compression": "^1.7.4",
     "console-stamp": "^3.1.1",
     "cors": "^2.8.5",

@@ -1,3 +1,4 @@
+import { createCache, MemoryCache, memoryStore } from "cache-manager";
 import { Client, DiscordAPIError, Events, GatewayIntentBits, PermissionResolvable, PermissionsBitField } from "discord.js";
 
 import Database from "../database/db";
@@ -14,9 +15,16 @@ export default class DiscordClient {
 
     private db: Database = Database.getInstance();
 
+    private cache: MemoryCache;
+
     private fetchedGuildIds = new Set<bigint>();
 
-    private constructor() {}
+    private constructor() {
+        this.cache = createCache(memoryStore({
+            max: 100,
+            ttl: 60 * 1000,
+        }));
+    }
 
     public static getInstance(): DiscordClient {
         if (!DiscordClient.instance) {
@@ -30,7 +38,7 @@ export default class DiscordClient {
             console.debug("Creating new client");
             this.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
             this.client.once(Events.ClientReady, c => {
-                console.log(`Ready! Logged in as ${c.user.tag}`);
+                console.info(`Ready! Logged in as ${c.user.tag}`);
             });
             await this.client.login(process.env.DISCORD_BOT_TOKEN);
         }
@@ -176,6 +184,11 @@ export default class DiscordClient {
     }
 
     public async getGuildsFromOauth(discordToken: string): Promise<OauthGuildData[] | null> {
+        const cached = await this.cache.get<OauthGuildData[]>(`getGuildsFromOauth-${discordToken}`);
+        if (cached !== undefined) {
+            return cached;
+        }
+
         const data: OauthGuildRawData[] = await fetch("https://discord.com/api/v10/users/@me/guilds", {
             headers: {
                 "Authorization": `Bearer ${discordToken}`,
@@ -190,7 +203,7 @@ export default class DiscordClient {
         const client = await this.getClient();
         await this.waitUntilReady();
 
-        return await Promise.all(data.map(async (rawGuild) => {
+        const guilds = await Promise.all(data.map(async (rawGuild) => {
             const permissions = new PermissionsBitField(BigInt(rawGuild.permissions));
             const fetchedGuild = await client.guilds.fetch(rawGuild.id).catch(() => null);
             return {
@@ -206,6 +219,10 @@ export default class DiscordClient {
                 features: rawGuild.features,
             };
         }));
+
+        await this.cache.set(`getGuildsFromOauth-${discordToken}`, guilds);
+
+        return guilds;
     }
 
 }
