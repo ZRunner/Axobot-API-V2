@@ -95,7 +95,7 @@ export default class GuildConfigManager {
     public async getGuildCategoriesConfigOptions(guildId: bigint, categories: readonly GuildConfigOptionCategory[]): Promise<PartialGuildConfig> {
         const setupOptions = await this.db.getFullGuildConfigOptions(guildId);
         const defaultConfig = GuildConfigManager.optionsList;
-        const config: PartialGuildConfig = {};
+        const config: PartialGuildConfig = Object.create(null);
         for (const categoryName of categories) {
             config[categoryName] = await this.getGuildConfigForCategory(guildId, categoryName);
             for (const [optionName, value] of Object.entries(defaultConfig[categoryName])) {
