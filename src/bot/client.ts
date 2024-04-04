@@ -22,7 +22,7 @@ export default class DiscordClient {
     private constructor() {
         this.cache = createCache(memoryStore({
             max: 100,
-            ttl: 60 * 1000,
+            ttl: 120 * 1000,
         }));
     }
 
