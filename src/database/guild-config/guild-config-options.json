@@ -356,7 +356,12 @@
             "allow_everyone": false,
             "default": null,
             "is_listed": true
-        }
+        },
+        "welcome_silent_mention": {
+            "type": "boolean",
+            "default": false,
+            "is_listed": true
+        },
     },
     "xp": {
         "enable_xp": {
