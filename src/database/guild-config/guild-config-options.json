@@ -361,7 +361,7 @@
             "type": "boolean",
             "default": false,
             "is_listed": true
-        },
+        }
     },
     "xp": {
         "enable_xp": {
