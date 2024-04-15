@@ -1,7 +1,7 @@
 export interface IntOptionRepresentation {
     type: "int";
     min: number;
-    max: number;
+    max: number | null;
     default: number | null;
     is_listed: boolean;
 }
