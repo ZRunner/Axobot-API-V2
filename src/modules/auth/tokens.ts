@@ -6,7 +6,7 @@ import Database from "../../database/db";
 const db = Database.getInstance();
 
 const JWT_SECRET_TOKEN = process.env.JWT_SECRET_TOKEN;
-const JWT_TOKEN_EXPIRATION_DAYS = Number(process.env.JWT_TOKEN_EXPIRATION_DAYS ?? "7");
+const JWT_TOKEN_EXPIRATION_DAYS = Number(process.env.JWT_TOKEN_EXPIRATION_DAYS ?? "14");
 
 export async function checkToken(token: string) {
     // Token validity
