@@ -115,6 +115,21 @@ export default class DiscordClient {
         }
     }
 
+    public async resolveRole(guildId: string, roleId: string) {
+        const guild = await this.resolveGuild(guildId);
+        if (guild === null) {
+            return null;
+        }
+        try {
+            return guild.roles.fetch(roleId);
+        } catch (err) {
+            if (isDiscordAPIError(err) && err.code === 10011) {
+                return null;
+            }
+            throw err;
+        }
+    }
+
     public async getMemberFromGuild(guildId: string, userId: string) {
         const guild = await this.resolveGuild(guildId);
         if (guild === null) {
@@ -223,6 +238,26 @@ export default class DiscordClient {
         await this.cache.set(`getGuildsFromOauth-${discordToken}`, guilds);
 
         return guilds;
+    }
+
+    public async getGuildRoleRewards(guildId: bigint): Promise<PopulatedRoleReward[]> {
+        const roleRewards = await this.db.getGuildRoleRewards(guildId);
+        return Promise.all(roleRewards.map(async (roleReward) => {
+            const role = await this.resolveRole(roleReward.guildId.toString(), roleReward.roleId.toString());
+            if (role === null) {
+                return {
+                    ...roleReward,
+                    role: null,
+                };
+            }
+            return {
+                ...roleReward,
+                role: {
+                    name: role.name,
+                    color: role.color,
+                },
+            };
+        }));
     }
 
 }

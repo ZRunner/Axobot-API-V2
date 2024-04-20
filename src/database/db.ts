@@ -2,7 +2,7 @@ import { createPool, Pool, PoolConfig, Types } from "mariadb";
 
 import { TokenInformation } from "./models/auth";
 import { DBRawUserData } from "./models/users";
-import { LeaderboardPlayer, RoleReward } from "./models/xp";
+import { DBRoleReward, LeaderboardPlayer } from "./models/xp";
 
 const BETA = process.env.DISCORD_ENTITY_ID === "1";
 
@@ -96,16 +96,21 @@ export default class Database {
         return await this.axobotPool.query("SELECT `version`, `release_date`, `fr`, `en` FROM `changelogs` WHERE `beta` = ? ORDER BY `release_date` DESC LIMIT 100", [BETA]);
     }
 
-    public async getGuildRoleRewards(guildId: bigint): Promise<RoleReward[]> {
-        type RawData = {[Property in keyof RoleReward]: RoleReward[Property] extends bigint ? string : RoleReward[Property]};
+    public async getGuildRoleRewards(guildId: bigint): Promise<DBRoleReward[]> {
+        interface RawData {
+            ID: string;
+            guild: string;
+            role: string;
+            level: string;
+            added_at: string;
+        }
         const result = await this.axobotPool.query<RawData[]>("SELECT `ID`, `guild`, `role`, `level`, `added_at` FROM `roles_rewards` WHERE `guild` = ?", [guildId]);
-        // convert strings to bigints
         return result.map((row) => ({
-            ...row,
-            "ID": BigInt(row.ID),
-            "guild": BigInt(row.guild),
-            "role": BigInt(row.role),
-            "level": BigInt(row.level),
+            id: BigInt(row.ID),
+            guildId: BigInt(row.guild),
+            roleId: BigInt(row.role),
+            level: BigInt(row.level),
+            addedAt: new Date(row.added_at),
         }));
     }
 

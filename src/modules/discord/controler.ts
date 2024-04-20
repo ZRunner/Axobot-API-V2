@@ -121,6 +121,7 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
     const guildData = await getGuildInfo(guild);
     const xpRate = xpType === "global" ? 1.0 : await configManager.getGuildConfigOptionValue(guildId, "xp_rate") as number;
     const xpDecay = xpType === "global" ? 0 : await configManager.getGuildConfigOptionValue(guildId, "xp_decay") as number;
+    const roleRewards = await discordClient.getGuildRoleRewards(guildId);
     res.send({
         "guild": guildData,
         "players": players,
@@ -128,6 +129,7 @@ export async function getGuildLeaderboard(req: Request, res: Response, next: Nex
         "xp_type": xpType,
         "xp_rate": xpRate,
         "xp_decay": xpDecay,
+        "role_rewards": roleRewards,
     });
 }
 
