@@ -4,6 +4,7 @@ import { Client, DiscordAPIError, Events, GatewayIntentBits, PermissionResolvabl
 import Database from "../database/db";
 import GuildConfigManager from "../database/guild-config/guild-config-manager";
 import { DBRawUserData } from "../database/models/users";
+import { PopulatedRoleReward } from "../database/models/xp";
 import { OauthGuildData, OauthGuildRawData } from "../modules/discord/types/guilds";
 import { isDiscordAPIError } from "../modules/discord/types/typeguards";
 
@@ -40,6 +41,11 @@ export default class DiscordClient {
             this.client.once(Events.ClientReady, c => {
                 console.info(`Ready! Logged in as ${c.user.tag}`);
             });
+            if (process.env.NODE_ENV === "development") {
+                this.client.on("debug", console.debug);
+            }
+            this.client.on("warn", console.warn);
+            this.client.on("error", console.error);
             await this.client.login(process.env.DISCORD_BOT_TOKEN);
         }
         return this.client;
