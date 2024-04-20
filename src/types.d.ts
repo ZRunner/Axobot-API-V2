@@ -12,6 +12,7 @@ declare module "http" {
 declare global {
     namespace NodeJS {
         interface ProcessEnv {
+            NODE_ENV?: "development" | "production";
             PORT?: string;
             BETA: boolean;
             DISCORD_CLIENT_ID: string;
