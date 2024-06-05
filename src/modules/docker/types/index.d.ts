@@ -23,3 +23,9 @@ export interface DockerPushEvent {
         status: string;
     };
 }
+
+export interface MinimalDockerPushEvent extends Partial<DockerPushEvent> {
+    callback_url: string;
+    push_data: Pick<DockerPushEvent["push_data"], "pusher" | "tag"> & Partial<DockerPushEvent["push_data"]>;
+    repository: Pick<DockerPushEvent["repository"], "repo_name" | "repo_url"> & Partial<DockerPushEvent["repository"]>;
+}
