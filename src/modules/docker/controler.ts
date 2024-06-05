@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
+import { is } from "typia";
 
 import { DiscordMessage } from "../../utils/discord_message";
-import { DockerPushEvent } from "./types";
+import { MinimalDockerPushEvent } from "./types";
 
-const EMBED_COLOR = 0x7289DA;
+const EMBED_COLOR = 0x0c49c2;
 
 function sendToDiscord(webhookPath: string, data: DiscordMessage) {
     return fetch(`https://discord.com/api/webhooks/${webhookPath}`, {
@@ -32,20 +33,31 @@ function callbackDockerhub(callbackUrl: string) {
     });
 }
 
-export async function postWebhookNotification(req: Request<{webhook_id: string, webhook_token: string}, unknown, DockerPushEvent>, res: Response) {
+export async function postWebhookNotification(req: Request, res: Response) {
     const webhookPath = req.params.webhook_id + "/" + req.params.webhook_token;
-    if (!/^\d+\/\w+$/.test(webhookPath)) {
+    if (!/^\d+\/[\w-]+$/.test(webhookPath)) {
         res.status(400).send("Invalid webhook path");
+        return;
+    }
+    if (!is<MinimalDockerPushEvent>(req.body)) {
+        res.status(400).send("Invalid request body");
         return;
     }
     const repo = req.body.repository;
     const pushData = req.body.push_data;
+    const callbackUrl = req.body.callback_url;
     const embed = {
         title: `New push on ${repo.repo_name}:${pushData.tag}`,
         description: `Pushed by ${pushData.pusher}\n\nLink: ${repo.repo_url}`,
         color: EMBED_COLOR,
     };
     await sendToDiscord(webhookPath, { embeds: [embed] });
-    await callbackDockerhub(req.body.callback_url);
+    try {
+        await callbackDockerhub(callbackUrl);
+    } catch (err) {
+        console.error("Failed to send callback:", err);
+        res.status(400).send("Failed to send callback");
+        return;
+    }
     res.send("ok");
 }
